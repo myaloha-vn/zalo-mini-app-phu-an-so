@@ -15,8 +15,41 @@ const DEMO_AUTHOR_WARD = 8;
 const CATEGORIES = ["Tin tức", "Thông báo", "Hoạt động"];
 const TONES = ["news-one", "news-two", "news-three", "news-four"];
 
-/** Bài do trưởng khu phố đăng trong phiên làm việc (demo). */
-export const userPosts: NewsItem[] = [];
+/** Bài do các khu phố đăng (demo: 2 bài mẫu + bài đăng mới trong phiên làm việc). */
+export const userPosts: NewsItem[] = [
+  {
+    title: "Khu phố 3 tổ chức sinh hoạt hè cho thiếu nhi",
+    date: "19/06/2025",
+    tone: "news-two",
+    category: "Hoạt động",
+    scope: "Khu phố 3",
+    author: "Trưởng Khu phố 3 – Lê Văn Phúc",
+    summary: "Ban điều hành Khu phố 3 phối hợp Chi đoàn khu phố tổ chức các buổi sinh hoạt hè cho thiếu nhi tại nhà văn hoá khu phố.",
+    body: [
+      "Chương trình gồm các hoạt động kể chuyện, vẽ tranh, trò chơi dân gian và hướng dẫn kỹ năng an toàn khi sử dụng Internet.",
+      "Phụ huynh có nhu cầu đăng ký cho con em tham gia vui lòng liên hệ Ban điều hành Khu phố 3.",
+    ],
+  },
+  {
+    title: "Khu phố 8 thông báo lịch họp dân định kỳ tháng 7",
+    date: "16/06/2025",
+    tone: "news-three",
+    category: "Thông báo",
+    scope: "Khu phố 8",
+    author: "Trưởng Khu phố 8 – Bùi Văn Sơn",
+    summary: "Ban điều hành Khu phố 8 thông báo lịch họp dân định kỳ tháng 7 để lấy ý kiến bà con về công tác vệ sinh môi trường và an ninh trật tự.",
+    body: [
+      "Thời gian và địa điểm cụ thể sẽ được thông báo tại nhà văn hoá khu phố và trên ứng dụng Phú An Số.",
+      "Rất mong bà con sắp xếp thời gian tham dự đầy đủ.",
+    ],
+  },
+];
+
+/** Sắp xếp bài viết mới nhất lên trước (ngày dạng dd/mm/yyyy). */
+export function byDateDesc(a: NewsItem, b: NewsItem) {
+  const k = (d: string) => d.split("/").reverse().join("");
+  return k(b.date).localeCompare(k(a.date));
+}
 
 function today() {
   const d = new Date();
@@ -51,7 +84,8 @@ export default function DangBaiScreen({ onBack, onPublished }: { onBack: () => v
       date: today(),
       tone: TONES[userPosts.length % TONES.length],
       image,
-      category: `${category} · ${ward.name}`,
+      category,
+      scope: ward.name,
       summary: summary.trim() || paras[0],
       body: summary.trim() ? paras : paras.slice(1),
       author: `Trưởng ${ward.name} – ${ward.head}`,

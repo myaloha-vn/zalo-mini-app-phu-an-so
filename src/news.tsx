@@ -13,7 +13,16 @@ export type NewsItem = {
   body: string[];
   /** Người đăng (ví dụ trưởng khu phố). Mặc định là UBND phường. */
   author?: string;
+  /** Phạm vi bài viết: "Toàn phường" (UBND phường đăng) hoặc tên khu phố (trưởng khu phố đăng). Mặc định "Toàn phường". */
+  scope?: string;
 };
+
+export const ALL_WARD = "Toàn phường";
+
+export function ScopeTag({ scope }: { scope?: string }) {
+  const s = scope ?? ALL_WARD;
+  return <span className={`scope-tag ${s === ALL_WARD ? "all" : "ward"}`}>{s}</span>;
+}
 
 export function NewsDetail({ item, onBack, go, topTitle = "Tin tức - Sự kiện", dateLabel }: { item: NewsItem; onBack: () => void; go: (s: Screen) => void; topTitle?: string; dateLabel?: string }) {
   return (
@@ -21,7 +30,7 @@ export function NewsDetail({ item, onBack, go, topTitle = "Tin tức - Sự ki�
       <Topbar title={topTitle} onBack={onBack}/>
       <div className="news-detail">
         {item.image ? <img className="news-hero news-hero-img" src={item.image} alt={item.title}/> : <div className={`news-hero ${item.tone}`}><div className="news-building"/><div className="news-tree"/></div>}
-        <span className="news-cat">{item.category}</span>
+        <div className="news-tags"><ScopeTag scope={item.scope} /><span className="news-cat">{item.category}</span></div>
         <h1 className="news-detail-title">{item.title}</h1>
         <div className="news-date"><Icon name="calendar" size={13}/>{dateLabel ? `${dateLabel} ` : ""}{item.date} · {item.author ?? "UBND phường Phú An"}</div>
         <p className="news-summary">{item.summary}</p>

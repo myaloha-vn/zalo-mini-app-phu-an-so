@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
 import PhanAnhModule from "./PhanAnh";
+import { userPosts, byDateDesc } from "./DangBai";
+import { NewsDetail, type NewsItem } from "./news";
 
 /* ---------------- Dữ liệu mẫu (thay bằng API khi tích hợp) ---------------- */
 
@@ -417,6 +419,8 @@ function initials(name: string) {
 function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBack: () => void; go: (s: Screen) => void; openFullMap: () => void }) {
   const [tab, setTab] = useState("Tin tức");
   const [reporting, setReporting] = useState(false);
+  const [article, setArticle] = useState<NewsItem | null>(null);
+  const wardPosts = userPosts.filter((p) => p.scope === ward.name).sort(byDateDesc);
   const space = spaceData(ward);
   const tone = ["blue", "green", "orange"][CLUSTERS.indexOf(ward.cluster)];
   const leaders = [
@@ -424,6 +428,7 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
     { role: "Phó khu phố", name: ward.deputy, phone: ward.deputyPhone },
   ];
 
+  if (article) return <NewsDetail item={article} onBack={() => setArticle(null)} go={go} />;
   if (reporting) return <PhanAnhModule go={go} initialWardId={ward.id} onBack={() => setReporting(false)} />;
 
   return (
@@ -484,6 +489,15 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
           </Tap>
         )}
         {tab === "Hồ sơ an sinh" ? <WelfareMapPanel ward={ward} /> : <div className="news-list kp-posts">
+          {tab === "Tin tức" && wardPosts.map((p) => (
+            <Tap className="news-item" key={p.title} onClick={() => setArticle(p)}>
+              {p.image ? <img className="news-thumb news-thumb-img kp-post-thumb" src={p.image} alt="" /> : <div className={`news-thumb kp-post-thumb ${p.tone}`}><div className="news-building" /><div className="news-tree" /></div>}
+              <div className="news-copy">
+                <div className="news-title">{p.title}</div>
+                <div className="news-date"><span className="category blue">{p.category}</span><Icon name="calendar" size={12} />{p.date}</div>
+              </div>
+            </Tap>
+          ))}
           {space[tab].map((p) => (
             <Tap className="news-item" key={p.title}>
               <DuotoneIcon icon={p.icon} color={p.color} small />

@@ -558,3 +558,15 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .db-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .db-cover-add { height: 110px; border-radius: 12px; border: 1.5px dashed #c9d4dd; color: #98a8b6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
 .db-note { margin: 12px 2px 0; }
+
+/* Tag phạm vi bài viết */
+.scope-tag { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 6px; font-size: 10px; font-weight: 800; letter-spacing: .1px; white-space: nowrap; }
+.scope-tag.all { color: #fff; background: #1677d2; }
+.scope-tag.ward { color: #b4561a; background: #fff0df; border: 1px solid #f6d7b8; }
+.news-date .scope-tag { margin-right: 4px; }
+.news-tags { display: flex; align-items: center; gap: 6px; margin-top: 16px; }
+.news-tags .news-cat { margin-top: 0; }
+.news-tags .scope-tag { padding: 3px 10px; border-radius: 999px; font-size: 11px; }
+.kp-posts .kp-post-thumb { width: 44px; height: 44px; border-radius: 12px; }
+.kp-posts .kp-post-thumb .news-building { width: 22px; height: 15px; left: 11px; bottom: 6px; }
+.kp-posts .kp-post-thumb .news-tree { width: 8px; height: 12px; left: 3px; bottom: 4px; }

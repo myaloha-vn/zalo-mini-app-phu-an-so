@@ -5,8 +5,8 @@ import AnSinhModule from "./AnSinh";
 import DuLichModule from "./DuLich";
 import PhanAnhModule from "./PhanAnh";
 import GioiThieuModule from "./GioiThieu";
-import DangBaiScreen, { userPosts } from "./DangBai";
-import { NewsDetail, type NewsItem } from "./news";
+import DangBaiScreen, { userPosts, byDateDesc } from "./DangBai";
+import { NewsDetail, ScopeTag, type NewsItem } from "./news";
 import quocHuy from "./assets/quoc-huy.png";
 import khuPhoIcon from "./assets/khu-pho-so-v2.png";
 import quyHoachIcon from "./assets/tra-cuu-quy-hoach.png";
@@ -154,10 +154,10 @@ function HomeScreen({ go }: { go: (screen: Screen) => void }) {
 
         <div className="section-heading news-heading"><span className="news-heading-title">Tin tức - Sự kiện<Tap className="news-pen" onClick={() => setComposing(true)}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-label="Đăng bài"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg></Tap></span><Tap className="view-all">Xem tất cả <Icon name="arrow" size={13}/></Tap></div>
         <div className="news-list">
-          {[...userPosts, ...news].slice(0, 4 + userPosts.length).map((item) => (
+          {[...userPosts, ...news].sort(byDateDesc).map((item) => (
             <Tap className="news-item" key={item.title} onClick={() => setArticle(item)}>
               {item.image ? <img className="news-thumb news-thumb-img" src={item.image} alt=""/> : <div className={`news-thumb ${item.tone}`}><div className="news-building"/><div className="news-tree"/></div>}
-              <div className="news-copy"><div className="news-title">{item.title}</div><div className="news-date"><Icon name="calendar" size={12}/>{item.date}</div></div>
+              <div className="news-copy"><div className="news-title">{item.title}</div><div className="news-date"><ScopeTag scope={item.scope}/><Icon name="calendar" size={12}/>{item.date}</div></div>
             </Tap>
           ))}
         </div>
