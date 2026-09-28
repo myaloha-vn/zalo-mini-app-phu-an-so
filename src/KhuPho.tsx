@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
-import { PhanAnhForm } from "./PhanAnh";
+import { PhanAnhForm, ReportList, ReportDetail, REPORTS, type Report } from "./PhanAnh";
 import { userPosts, byDateDesc } from "./DangBai";
 import { NewsDetail, type NewsItem } from "./news";
 
@@ -258,11 +258,7 @@ function spaceData(w: Ward): Record<string, Post[]> {
       { title: "Thu phí vệ sinh môi trường quý III/2025", date: "17/06/2025", tag: "Thu phí", icon: "megaphone", color: "blue" },
     ],
     "Hồ sơ an sinh": [],
-    "Phản ánh": [
-      { title: "Đèn chiếu sáng trong hẻm bị hỏng", date: "23/06/2025", tag: "Đã xử lý", icon: "alert", color: "green" },
-      { title: "Rác thải tập kết không đúng nơi quy định ở đầu hẻm", date: "21/06/2025", tag: "Đang xử lý", icon: "alert", color: "orange" },
-      { title: "Nắp cống bị vỡ trên tuyến đường nội bộ", date: "18/06/2025", tag: "Đã tiếp nhận", icon: "alert", color: "blue" },
-    ],
+    "Phản ánh": [],
   };
 }
 
@@ -420,6 +416,9 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
   const [tab, setTab] = useState("Tin tức");
   const [reporting, setReporting] = useState(false);
   const [article, setArticle] = useState<NewsItem | null>(null);
+  const [report, setReport] = useState<Report | null>(null);
+  const [, setTick] = useState(0);
+  const wardReports = REPORTS.filter((r) => r.wardId === ward.id).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   const wardPosts = userPosts.filter((p) => p.scope === ward.name).sort(byDateDesc);
   const space = spaceData(ward);
   const tone = ["blue", "green", "orange"][CLUSTERS.indexOf(ward.cluster)];
@@ -428,6 +427,15 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
     { role: "Phó khu phố", name: ward.deputy, phone: ward.deputyPhone },
   ];
 
+  if (report) {
+    return (
+      <div className="screen pa-screen">
+        <Topbar title={report.code} onBack={() => setReport(null)} />
+        <div className="pk-staff-note pk-kp-note"><Icon name="user" size={14} />Chế độ Trưởng {ward.name} (demo, chưa kiểm tra quyền)</div>
+        <ReportDetail r={report} staff onChange={() => setTick((x) => x + 1)} />
+      </div>
+    );
+  }
   if (article) return <NewsDetail item={article} onBack={() => setArticle(null)} go={go} />;
   if (reporting) return <PhanAnhForm go={go} initialWardId={ward.id} onBack={() => setReporting(false)} />;
 
@@ -488,7 +496,7 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
             <Icon name="arrow" size={15} />
           </Tap>
         )}
-        {tab === "Hồ sơ an sinh" ? <WelfareMapPanel ward={ward} /> : <div className="news-list kp-posts">
+        {tab === "Phản ánh" ? <ReportList items={wardReports} onOpen={setReport} empty="Khu phố chưa có phản ánh nào." /> : tab === "Hồ sơ an sinh" ? <WelfareMapPanel ward={ward} /> : <div className="news-list kp-posts">
           {tab === "Tin tức" && wardPosts.map((p) => (
             <Tap className="news-item" key={p.title} onClick={() => setArticle(p)}>
               {p.image ? <img className="news-thumb news-thumb-img kp-post-thumb" src={p.image} alt="" /> : <div className={`news-thumb kp-post-thumb ${p.tone}`}><div className="news-building" /><div className="news-tree" /></div>}

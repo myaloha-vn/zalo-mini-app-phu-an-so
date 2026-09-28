@@ -270,6 +270,26 @@ export const REPORTS: Report[] = [
   },
 ];
 
+// Mỗi khu phố có 3 phản ánh mẫu (minh hoạ) để trưởng khu phố thử xử lý.
+const WARD_SAMPLES: [string, string, string, ReportStatus, number][] = [
+  ["Điện – chiếu sáng công cộng", "Đèn chiếu sáng trong hẻm bị hỏng, buổi tối rất tối.", "Hẻm 3", "Đã xử lý", 35],
+  ["Môi trường – vệ sinh", "Rác thải tập kết không đúng nơi quy định ở đầu hẻm.", "Đầu hẻm 7", "Đang xử lý", 12],
+  ["Hạ tầng – giao thông", "Nắp cống bị vỡ trên tuyến đường nội bộ, nguy hiểm cho người đi đường.", "Đường nội bộ số 2", "Đã tiếp nhận", 4],
+];
+for (let w = 1; w <= 15; w++) {
+  WARD_SAMPLES.forEach(([category, content, place, status, ago], i) => {
+    const created = daysAgo(ago + (w % 3), 8 + i);
+    const history: Report["history"] = [{ at: created, status: "Đã tiếp nhận", note: `Hệ thống chuyển tới Khu phố ${w}` }];
+    if (status !== "Đã tiếp nhận") history.push({ at: daysAgo(ago - 1 + (w % 3), 14), status: "Đang xử lý", note: "Trưởng khu phố đã tiếp nhận, phối hợp đơn vị liên quan xử lý" });
+    if (status === "Đã xử lý") history.push({ at: daysAgo(ago - 3 + (w % 3), 16), status: "Đã xử lý", note: "Đã khắc phục xong" });
+    REPORTS.push({
+      code: `PA-KP${String(w).padStart(2, "0")}-${i + 1}`, category, content, location: `${place}, Khu phố ${w}, Phường Phú An`, wardId: w,
+      photos: [], mine: false, status, createdAt: created, history,
+      reporter: { name: "Người dân (dữ liệu minh hoạ)", phone: `0900 000 ${String(300 + w * 3 + i)}`, address: `Khu phố ${w}` },
+    });
+  });
+}
+
 const STATUS_CLS: Record<ReportStatus, string> = { "Đã tiếp nhận": "blue", "Đang xử lý": "orange", "Đã xử lý": "green" };
 const NEXT: Partial<Record<ReportStatus, ReportStatus>> = { "Đã tiếp nhận": "Đang xử lý", "Đang xử lý": "Đã xử lý" };
 const fmtTime = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")} ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
@@ -292,7 +312,7 @@ function StatusBadge({ s }: { s: ReportStatus }) {
   return <span className={`category ${STATUS_CLS[s]}`}>{s}</span>;
 }
 
-function ReportList({ items, onOpen, empty }: { items: Report[]; onOpen: (r: Report) => void; empty: string }) {
+export function ReportList({ items, onOpen, empty }: { items: Report[]; onOpen: (r: Report) => void; empty: string }) {
   if (!items.length) return <div className="pk-empty">{empty}</div>;
   return (
     <div className="pk-list">
@@ -308,7 +328,7 @@ function ReportList({ items, onOpen, empty }: { items: Report[]; onOpen: (r: Rep
   );
 }
 
-function ReportDetail({ r, staff, onChange }: { r: Report; staff: boolean; onChange: () => void }) {
+export function ReportDetail({ r, staff, onChange }: { r: Report; staff: boolean; onChange: () => void }) {
   const [note, setNote] = useState("");
   const next = NEXT[r.status];
   const advance = () => {
@@ -395,6 +415,7 @@ type View = { name: "hub" | "form" | "track" | "handle" | "guide" } | { name: "d
 export default function PhanAnhModule({ go }: { go: (s: Screen) => void }) {
   const [view, setView] = useState<View>({ name: "hub" });
   const [, setTick] = useState(0);
+  const [wardFilter, setWardFilter] = useState(0);
   const refresh = () => setTick((t) => t + 1);
   const hub = () => setView({ name: "hub" });
 
@@ -441,7 +462,14 @@ export default function PhanAnhModule({ go }: { go: (s: Screen) => void }) {
       {view.name === "handle" && (
         <div className="pa-body">
           <div className="pk-staff-note"><Icon name="user" size={14} />Dành cho cán bộ khu phố / phường (bản demo chưa kiểm tra quyền).</div>
-          <ReportList items={pending} onOpen={(r) => setView({ name: "detail", report: r, staff: true, from: "handle" })} empty="Không còn phản ánh chờ xử lý." />
+          <div className="an-chips pk-ward-chips">
+            {[0, ...Array.from(new Set(pending.map((r) => r.wardId))).sort((a, b) => a - b)].map((w) => (
+              <Tap key={w} className={`db-chip ${wardFilter === w ? "on" : ""}`} onClick={() => setWardFilter(w)}>
+                {w === 0 ? `Tất cả (${pending.length})` : `KP ${w} (${pending.filter((r) => r.wardId === w).length})`}
+              </Tap>
+            ))}
+          </div>
+          <ReportList items={pending.filter((r) => !wardFilter || r.wardId === wardFilter)} onOpen={(r) => setView({ name: "detail", report: r, staff: true, from: "handle" })} empty="Không còn phản ánh chờ xử lý." />
         </div>
       )}
       {view.name === "guide" && <Guide />}

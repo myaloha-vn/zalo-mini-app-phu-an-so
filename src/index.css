@@ -623,3 +623,6 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .an-chips .db-chip { flex: 0 0 auto; background: var(--surface); }
 .an-chips .db-chip.on { background: #1677d2; }
 .an-count { margin: 12px 2px 8px; color: #8a9aa8; font-size: 12px; }
+.pk-ward-chips { margin-bottom: 12px; }
+.pk-kp-note { margin: 10px 14px 0; }
+.pk-kp-note + .pa-body { height: calc(100% - 60px - 44px); }
