@@ -1,0 +1,10 @@
+{
+  "description": "Provides a modern digital platform for residents to access community services, urban planning info, social welfare policies, and local news efficiently.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
