@@ -4,7 +4,7 @@ import dichVuCongIcon from "./assets/dich-vu-cong.png";
 import phanAnhIcon from "./assets/phan-anh-kien-nghi-v3.png";
 import chatbotIcon from "./assets/chatbot-ai-v2.png";
 
-export type Screen = "home" | "map" | "social" | "khupho" | "dulich";
+export type Screen = "home" | "map" | "social" | "khupho" | "dulich" | "phananh" | "gioithieu";
 export type IconName =
   | "chat"
   | "leaf"
@@ -104,15 +104,37 @@ export function DuotoneIcon({ icon, color, small = false }: { icon: IconName; co
 
 /* ---------------- Menu tiện ích (dùng chung cho thanh điều hướng & trang chủ) ---------------- */
 
-export type Utility = { label: string; icon: IconName; color: string; screen?: Screen; img?: string };
+export type Utility = { label: string; icon: IconName; color: string; screen?: Screen; img?: string; url?: string; submenu?: UtilityGroup[] };
+export type UtilityGroup = { title: string; items: Utility[] };
 
-export const UTILITY_GROUPS: { title: string; items: Utility[] }[] = [
+// Menu con của "Dịch vụ công". Đường dẫn trỏ tới Cổng Dịch vụ công Quốc gia; đổi sang cổng DVC TP.HCM / hệ thống của phường nếu cần.
+const DVC_SUBMENU: UtilityGroup[] = [
+  {
+    title: "Nộp & tra cứu hồ sơ",
+    items: [
+      { label: "Nộp hồ sơ trực tuyến", icon: "document", color: "blue", url: "https://dichvucong.gov.vn" },
+      { label: "Tra cứu hồ sơ", icon: "search", color: "green", url: "https://dichvucong.gov.vn" },
+      { label: "Thanh toán trực tuyến", icon: "ticket", color: "orange", url: "https://dichvucong.gov.vn" },
+    ],
+  },
+  {
+    title: "Thủ tục hành chính",
+    items: [
+      { label: "Hộ tịch - hộ khẩu", icon: "document", color: "blue" },
+      { label: "Đăng ký kinh doanh", icon: "briefcase", color: "purple" },
+      { label: "Giáo dục", icon: "book", color: "orange" },
+      { label: "Y tế", icon: "health", color: "green" },
+    ],
+  },
+];
+
+export const UTILITY_GROUPS: UtilityGroup[] = [
   {
     title: "Tiện ích nhanh",
     items: [
-      { label: "Giới thiệu phường", icon: "info", color: "blue", img: gioiThieuIcon },
-      { label: "Dịch vụ công", icon: "document", color: "purple", img: dichVuCongIcon },
-      { label: "Phản ánh kiến nghị", icon: "alert", color: "orange", img: phanAnhIcon },
+      { label: "Giới thiệu phường", icon: "info", color: "blue", img: gioiThieuIcon, screen: "gioithieu" },
+      { label: "Dịch vụ công", icon: "document", color: "purple", img: dichVuCongIcon, submenu: DVC_SUBMENU },
+      { label: "Phản ánh kiến nghị", icon: "alert", color: "orange", img: phanAnhIcon, screen: "phananh" },
       { label: "Chatbot AI", icon: "chat", color: "green", img: chatbotIcon },
     ],
   },
@@ -144,32 +166,42 @@ export const UTILITY_GROUPS: { title: string; items: Utility[] }[] = [
   },
 ];
 
+const isReady = (it: Utility) => Boolean(it.screen || it.url || it.submenu);
+
+export function openUtility(it: Utility, go: (s: Screen) => void, openSubmenu: (it: Utility) => void) {
+  if (it.submenu) openSubmenu(it);
+  else if (it.screen) go(it.screen);
+  else if (it.url) window.open(it.url, "_blank", "noopener");
+}
+
 export function UtilityTile({ item, onClick }: { item: Utility; onClick?: () => void }) {
   return (
-    <Tap className={`util-tile ${item.screen ? "" : "soon"}`} onClick={onClick}>
+    <Tap className={`util-tile ${isReady(item) ? "" : "soon"}`} onClick={onClick}>
       {item.img ? <img className="util-img" src={item.img} alt="" /> : <DuotoneIcon icon={item.icon} color={item.color} small />}
       <div className="util-label">{item.label}</div>
-      {!item.screen && <span className="util-soon">Sắp có</span>}
+      {!isReady(item) && <span className="util-soon">Sắp có</span>}
     </Tap>
   );
 }
 
-export function UtilitySheet({ onClose, go }: { onClose: () => void; go: (s: Screen) => void }) {
+export function UtilitySheet({ onClose, go, title = "Tiện ích", groups = UTILITY_GROUPS }: { onClose: () => void; go: (s: Screen) => void; title?: string; groups?: UtilityGroup[] }) {
+  const [sub, setSub] = useState<Utility | null>(null);
+  if (sub?.submenu) return <UtilitySheet onClose={() => setSub(null)} go={go} title={sub.label} groups={sub.submenu} />;
   return (
     <div className="util-backdrop" onClick={onClose}>
       <div className="util-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-handle" />
         <div className="util-head">
-          <span>Tiện ích</span>
+          <span>{title}</span>
           <Tap className="util-close" onClick={onClose}>×</Tap>
         </div>
         <div className="util-scroll">
-          {UTILITY_GROUPS.map((g) => (
+          {groups.map((g) => (
             <div className="util-group" key={g.title}>
               <div className="util-group-title">{g.title}</div>
               <div className="util-grid">
                 {g.items.map((it) => (
-                  <UtilityTile key={it.label} item={it} onClick={() => { if (it.screen) { onClose(); go(it.screen); } }} />
+                  <UtilityTile key={it.label} item={it} onClick={() => openUtility(it, (s) => { onClose(); go(s); }, setSub)} />
                 ))}
               </div>
             </div>

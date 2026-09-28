@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
+import PhanAnhModule from "./PhanAnh";
 
 /* ---------------- Dữ liệu mẫu (thay bằng API khi tích hợp) ---------------- */
 
-type Ward = {
+export type Ward = {
   id: number;
   name: string;
   cluster: string;
@@ -27,7 +28,7 @@ const DEPUTIES = ["Lê Thị Bích", "Nguyễn Văn Nam", "Phạm Thị Yến", 
 
 const CLUSTERS = ["Cụm 1", "Cụm 2", "Cụm 3"];
 
-const WARDS: Ward[] = RAW.map(([population, households, area, residentRate], i) => ({
+export const WARDS: Ward[] = RAW.map(([population, households, area, residentRate], i) => ({
   id: i + 1,
   name: `Khu phố ${i + 1}`,
   cluster: CLUSTERS[Math.floor(i / 5)],
@@ -70,7 +71,7 @@ const CELLS = Array.from({ length: COLS * ROWS }, (_, i) => {
 const CLUSTER_FILL = ["#D6E8F9", "#D7EEDF", "#F7E5CB"];
 const CLUSTER_INK = ["#1677d2", "#289c73", "#d9822f"];
 
-function WardMap({ highlight, onSelect, zoom = false, dimCluster, className = "" }: { highlight?: number; onSelect?: (id: number) => void; zoom?: boolean; dimCluster?: string; className?: string }) {
+export function WardMap({ highlight, onSelect, zoom = false, dimCluster, className = "" }: { highlight?: number; onSelect?: (id: number) => void; zoom?: boolean; dimCluster?: string; className?: string }) {
   const focus = highlight ? CELLS[highlight - 1] : undefined;
   const viewBox = zoom && focus ? `${(focus.cx - 130).toFixed(1)} ${(focus.cy - 80).toFixed(1)} 260 160` : "0 0 390 300";
   const ordered = [...CELLS].sort((a, b) => (a.id === highlight ? 1 : 0) - (b.id === highlight ? 1 : 0));
@@ -244,22 +245,171 @@ type Post = { title: string; date: string; tag: string; icon: IconName; color: s
 
 function spaceData(w: Ward): Record<string, Post[]> {
   return {
-    "Hoạt động nổi bật": [
-      { title: `Ngày Chủ nhật xanh – ${w.name} ra quân vệ sinh đường phố`, date: "22/06/2025", tag: "Môi trường", icon: "star", color: "green" },
-      { title: "Hướng dẫn người dân kích hoạt tài khoản định danh điện tử", date: "19/06/2025", tag: "Chuyển đổi số", icon: "star", color: "blue" },
-      { title: "Sinh hoạt hè cho thiếu nhi tại nhà văn hoá khu phố", date: "15/06/2025", tag: "Văn hoá", icon: "star", color: "orange" },
+    "Tin tức": [
+      { title: `${w.name} triển khai nhóm Zalo kết nối cư dân`, date: "21/06/2025", tag: "Khu phố số", icon: "document", color: "blue" },
+      { title: "Tổng kết phong trào xây dựng đời sống văn hoá 6 tháng đầu năm", date: "16/06/2025", tag: "Văn hoá", icon: "document", color: "green" },
+      { title: "Lắp đặt thêm camera an ninh tại các tuyến hẻm", date: "12/06/2025", tag: "An ninh", icon: "document", color: "purple" },
     ],
     "Thông báo": [
       { title: `Họp ${w.name} định kỳ tháng 7/2025 lúc 19h00`, date: "24/06/2025", tag: "Quan trọng", icon: "megaphone", color: "purple" },
       { title: "Tạm ngưng cấp điện để bảo trì lưới điện khu vực", date: "20/06/2025", tag: "Điện lực", icon: "megaphone", color: "orange" },
       { title: "Thu phí vệ sinh môi trường quý III/2025", date: "17/06/2025", tag: "Thu phí", icon: "megaphone", color: "blue" },
     ],
-    "Tin tức": [
-      { title: `${w.name} triển khai nhóm Zalo kết nối cư dân`, date: "21/06/2025", tag: "Khu phố số", icon: "document", color: "blue" },
-      { title: "Tổng kết phong trào xây dựng đời sống văn hoá 6 tháng đầu năm", date: "16/06/2025", tag: "Văn hoá", icon: "document", color: "green" },
-      { title: "Lắp đặt thêm camera an ninh tại các tuyến hẻm", date: "12/06/2025", tag: "An ninh", icon: "document", color: "purple" },
+    "Hồ sơ an sinh": [],
+    "Phản ánh": [
+      { title: "Đèn chiếu sáng trong hẻm bị hỏng", date: "23/06/2025", tag: "Đã xử lý", icon: "alert", color: "green" },
+      { title: "Rác thải tập kết không đúng nơi quy định ở đầu hẻm", date: "21/06/2025", tag: "Đang xử lý", icon: "alert", color: "orange" },
+      { title: "Nắp cống bị vỡ trên tuyến đường nội bộ", date: "18/06/2025", tag: "Đã tiếp nhận", icon: "alert", color: "blue" },
     ],
   };
+}
+
+/* ---------------- Hồ sơ an sinh trên bản đồ ---------------- */
+// DỮ LIỆU MINH HOẠ (tên, hoàn cảnh là giả định). Hồ sơ an sinh thật là dữ liệu cá nhân nhạy cảm:
+// chỉ hiển thị cho cán bộ đã đăng nhập & được phân quyền, lấy qua API có kiểm soát truy cập.
+
+type WelfareStatus = "Đang hỗ trợ" | "Đang theo dõi" | "Chờ xét duyệt";
+type Welfare = {
+  code: string;
+  group: string;
+  groupColor: string;
+  status: WelfareStatus;
+  name: string;
+  address: string;
+  support: string;
+  note: string;
+  amount: string;
+  officer: string;
+  updated: string;
+  x: number; // vị trí ghim trên bản đồ (%)
+  y: number;
+};
+
+const WELFARE_SEED = [
+  { group: "Người cao tuổi", groupColor: "green", status: "Đang theo dõi", name: "Bà Trần Thị Sáu", support: "Trợ cấp hàng tháng", note: "Sống cùng cháu nhỏ, không có nguồn thu nhập ổn định.", amount: "500.000đ/tháng", x: 34, y: 38 },
+  { group: "Hộ cận nghèo", groupColor: "orange", status: "Đang hỗ trợ", name: "Hộ ông Lê Văn Bảy", support: "Hỗ trợ thẻ BHYT, học phí", note: "Lao động chính làm nghề tự do, thu nhập không ổn định.", amount: "Theo chính sách", x: 62, y: 30 },
+  { group: "Người khuyết tật", groupColor: "purple", status: "Đang hỗ trợ", name: "Ông Nguyễn Văn Tám", support: "Trợ cấp xã hội hàng tháng", note: "Khuyết tật vận động, cần hỗ trợ đi lại khi làm thủ tục.", amount: "720.000đ/tháng", x: 46, y: 64 },
+  { group: "Hộ nghèo", groupColor: "blue", status: "Chờ xét duyệt", name: "Hộ bà Phạm Thị Chín", support: "Đề nghị hỗ trợ sửa chữa nhà", note: "Nhà xuống cấp, đang chờ khảo sát thực tế.", amount: "Chờ xét duyệt", x: 70, y: 60 },
+] as const;
+
+function welfareData(w: Ward): Welfare[] {
+  return WELFARE_SEED.map((r, i) => ({
+    ...r,
+    status: r.status as WelfareStatus,
+    code: `AS-${pad(w.id)}-${String(i + 1).padStart(3, "0")}`,
+    address: `${w.name}, Phường Phú An`,
+    officer: `Cán bộ LĐ-TB&XH phụ trách ${w.name}`,
+    updated: ["22/06/2025", "18/06/2025", "12/06/2025", "20/06/2025"][i],
+  }));
+}
+
+const STATUS_DOT: Record<WelfareStatus, string> = { "Đang hỗ trợ": "#289c73", "Đang theo dõi": "#8a9aa8", "Chờ xét duyệt": "#d9822f" };
+const PIN_COLOR: Record<string, string> = { green: "#289c73", orange: "#e0852f", purple: "#7451bf", blue: "#1677d2" };
+
+function openDirections(address: string) {
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address + ", TP. Hồ Chí Minh")}`, "_blank", "noopener");
+}
+
+function WelfareCard({ item, onDetail, onClose }: { item: Welfare; onDetail: () => void; onClose?: () => void }) {
+  return (
+    <div className="as-card">
+      <div className="as-card-top">
+        <span className={`category ${item.groupColor}`}>{item.group}</span>
+        <span className="as-status"><i style={{ background: STATUS_DOT[item.status] }} />{item.status}</span>
+        {onClose && <Tap className="as-close" onClick={onClose}>✕</Tap>}
+      </div>
+      <div className="as-name">{item.name}</div>
+      <div className="as-row"><b>Địa chỉ</b><span>{item.address}</span></div>
+      <div className="as-row"><b>Hỗ trợ</b><span>{item.support}</span></div>
+      <div className="as-note">{item.note}</div>
+      <div className="as-actions">
+        <Tap className="as-btn solid" onClick={onDetail}>Xem chi tiết</Tap>
+        <Tap className="as-btn ghost" onClick={() => openDirections(item.address)}>Chỉ đường</Tap>
+      </div>
+    </div>
+  );
+}
+
+function WelfareDetail({ item, onBack }: { item: Welfare; onBack: () => void }) {
+  const rows: [string, string][] = [
+    ["Mã hồ sơ", item.code],
+    ["Nhóm đối tượng", item.group],
+    ["Trạng thái", item.status],
+    ["Địa chỉ", item.address],
+    ["Nội dung hỗ trợ", item.support],
+    ["Mức hỗ trợ", item.amount],
+    ["Cán bộ phụ trách", item.officer],
+    ["Cập nhật lần cuối", item.updated],
+  ];
+  return (
+    <div className="as-detail">
+      <div className="as-detail-head">
+        <Tap className="as-back" onClick={onBack}><Icon name="back" size={18} /></Tap>
+        <div><div className="as-name">{item.name}</div><span className={`category ${item.groupColor}`}>{item.group}</span></div>
+      </div>
+      <div className="as-table">{rows.map(([k, v]) => <div className="as-row" key={k}><b>{k}</b><span>{v}</span></div>)}</div>
+      <div className="as-note">{item.note}</div>
+      <div className="as-actions">
+        <Tap className="as-btn ghost" onClick={() => openDirections(item.address)}>Chỉ đường</Tap>
+      </div>
+    </div>
+  );
+}
+
+function WelfareMapPanel({ ward }: { ward: Ward }) {
+  const [unlocked, setUnlocked] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [detail, setDetail] = useState(false);
+  const items = welfareData(ward);
+  const cur = selected !== null ? items[selected] : null;
+
+  if (!unlocked) {
+    return (
+      <div className="kp-panel as-lock">
+        <DuotoneIcon icon="user" color="blue" small />
+        <div className="as-lock-title">Dành cho cán bộ được phân quyền</div>
+        <p>Hồ sơ an sinh chứa thông tin cá nhân của người dân nên chỉ hiển thị khi cán bộ đăng nhập.</p>
+        <Tap className="as-btn solid" onClick={() => setUnlocked(true)}>Đăng nhập cán bộ (demo)</Tap>
+      </div>
+    );
+  }
+
+  const close = () => { setSelected(null); setDetail(false); };
+  return (
+    <div className="as-wrap">
+      <div className="as-map-box">
+        <div className="as-demo">Dữ liệu minh hoạ</div>
+        <WardMap highlight={ward.id} zoom className="as-map" />
+        {items.map((it, i) => (
+          <Tap key={it.code} className={`as-pin ${selected === i ? "on" : ""}`} onClick={() => { setSelected(i); setDetail(false); }}>
+            <svg viewBox="0 0 24 30" width="26" height="32" aria-label={it.name} style={{ left: `${it.x}%`, top: `${it.y}%` }}>
+              <path d="M12 29C4 19 1 15 1 11a11 11 0 0 1 22 0c0 4-3 8-11 18Z" fill={PIN_COLOR[it.groupColor]} stroke="#fff" strokeWidth="2" />
+              <circle cx="12" cy="11" r="4" fill="#fff" />
+            </svg>
+          </Tap>
+        ))}
+      </div>
+      <div className="as-count"><b>{items.length}</b> hồ sơ an sinh tại {ward.name}</div>
+      <div className="news-list kp-posts as-list">
+        {items.map((it, i) => (
+          <Tap className={`news-item ${selected === i ? "on" : ""}`} key={it.code} onClick={() => { setSelected(i); setDetail(false); }}>
+            <span className="as-list-pin" style={{ background: PIN_COLOR[it.groupColor] }}><Icon name="location" size={15} color="#fff" /></span>
+            <div className="news-copy">
+              <div className="news-title">{it.name}</div>
+              <div className="news-date"><span className={`category ${it.groupColor}`}>{it.group}</span><span className="as-status"><i style={{ background: STATUS_DOT[it.status] }} />{it.status}</span></div>
+            </div>
+          </Tap>
+        ))}
+      </div>
+      {cur && (
+        <div className="as-backdrop" onClick={close}>
+          <div className="as-sheet" onClick={(e) => e.stopPropagation()}>
+            {detail ? <WelfareDetail item={cur} onBack={() => setDetail(false)} /> : <WelfareCard item={cur} onDetail={() => setDetail(true)} onClose={close} />}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 const PHOTOS = [
@@ -275,13 +425,16 @@ function initials(name: string) {
 }
 
 function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBack: () => void; go: (s: Screen) => void; openFullMap: () => void }) {
-  const [tab, setTab] = useState("Hoạt động nổi bật");
+  const [tab, setTab] = useState("Tin tức");
+  const [reporting, setReporting] = useState(false);
   const space = spaceData(ward);
   const tone = ["blue", "green", "orange"][CLUSTERS.indexOf(ward.cluster)];
   const leaders = [
     { role: "Trưởng khu phố", name: ward.head, phone: ward.headPhone },
     { role: "Phó khu phố", name: ward.deputy, phone: ward.deputyPhone },
   ];
+
+  if (reporting) return <PhanAnhModule go={go} initialWardId={ward.id} onBack={() => setReporting(false)} />;
 
   return (
     <div className="screen kp-screen">
@@ -333,7 +486,14 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
         <div className="kp-tabs">
           {Object.keys(space).map((t) => <Tap key={t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>{t}</Tap>)}
         </div>
-        <div className="news-list kp-posts">
+        {tab === "Phản ánh" && (
+          <Tap className="kp-report-btn" onClick={() => setReporting(true)}>
+            <Icon name="megaphone" size={18} />
+            <div><b>Gửi phản ánh</b><span>Phản ánh sẽ được chuyển tới Ban điều hành {ward.name}</span></div>
+            <Icon name="arrow" size={15} />
+          </Tap>
+        )}
+        {tab === "Hồ sơ an sinh" ? <WelfareMapPanel ward={ward} /> : <div className="news-list kp-posts">
           {space[tab].map((p) => (
             <Tap className="news-item" key={p.title}>
               <DuotoneIcon icon={p.icon} color={p.color} small />
@@ -343,7 +503,7 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
               </div>
             </Tap>
           ))}
-        </div>
+        </div>}
 
         <div className="section-heading"><span>Hình ảnh hoạt động cộng đồng</span><Tap className="view-all">Xem tất cả <Icon name="arrow" size={13} /></Tap></div>
         <div className="kp-gallery">

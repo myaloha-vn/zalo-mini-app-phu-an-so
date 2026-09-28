@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, UtilitySheet, UtilityTile, UTILITY_GROUPS, type Screen, type IconName } from "./ui";
+import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, UtilitySheet, UtilityTile, UTILITY_GROUPS, openUtility, type Screen, type IconName, type Utility } from "./ui";
 import KhuPhoModule from "./KhuPho";
 import AnSinhModule from "./AnSinh";
 import DuLichModule from "./DuLich";
+import PhanAnhModule from "./PhanAnh";
+import GioiThieuModule from "./GioiThieu";
+import { NewsDetail, type NewsItem } from "./news";
 import quocHuy from "./assets/quoc-huy.png";
 import khuPhoIcon from "./assets/khu-pho-so-v2.png";
 import quyHoachIcon from "./assets/tra-cuu-quy-hoach.png";
@@ -58,7 +61,6 @@ const featureCards = [
 ];
 
 
-type NewsItem = { title: string; date: string; tone: string; image?: string; category: string; summary: string; body: string[] };
 
 // LƯU Ý: nội dung bài viết dưới đây là NỘI DUNG MINH HOẠ — cần thay bằng bài viết chính thức do UBND phường cung cấp.
 const news: NewsItem[] = [
@@ -116,25 +118,10 @@ const news: NewsItem[] = [
   },
 ];
 
-function NewsDetail({ item, onBack, go }: { item: NewsItem; onBack: () => void; go: (s: Screen) => void }) {
-  return (
-    <div className="screen news-screen">
-      <Topbar title="Tin tức - Sự kiện" onBack={onBack}/>
-      <div className="news-detail">
-        {item.image ? <img className="news-hero news-hero-img" src={item.image} alt={item.title}/> : <div className={`news-hero ${item.tone}`}><div className="news-building"/><div className="news-tree"/></div>}
-        <span className="news-cat">{item.category}</span>
-        <h1 className="news-detail-title">{item.title}</h1>
-        <div className="news-date"><Icon name="calendar" size={13}/>{item.date} · UBND phường Phú An</div>
-        <p className="news-summary">{item.summary}</p>
-        {item.body.map((para, i) => <p className="news-para" key={i}>{para}</p>)}
-      </div>
-      <BottomNav active="Trang chủ" go={go}/>
-    </div>
-  );
-}
 
 function HomeScreen({ go }: { go: (screen: Screen) => void }) {
   const [utils, setUtils] = useState(false);
+  const [submenu, setSubmenu] = useState<Utility | null>(null);
   const [article, setArticle] = useState<NewsItem | null>(null);
   if (article) return <NewsDetail item={article} onBack={() => setArticle(null)} go={go}/>;
   return (
@@ -158,7 +145,7 @@ function HomeScreen({ go }: { go: (screen: Screen) => void }) {
         <div className="section-heading"><span>Tiện ích nhanh</span><Tap className="view-all" onClick={() => setUtils(true)}>Xem tất cả <Icon name="arrow" size={13}/></Tap></div>
         <div className="quick-row">
           {UTILITY_GROUPS[0].items.map((item) => (
-            <UtilityTile key={item.label} item={item} onClick={() => setUtils(true)} />
+            <UtilityTile key={item.label} item={item} onClick={() => openUtility(item, go, setSubmenu)} />
           ))}
         </div>
 
@@ -174,6 +161,7 @@ function HomeScreen({ go }: { go: (screen: Screen) => void }) {
       </div>
       <BottomNav active="Trang chủ" go={go}/>
       {utils && <UtilitySheet onClose={() => setUtils(false)} go={go}/>}
+      {submenu?.submenu && <UtilitySheet onClose={() => setSubmenu(null)} go={go} title={submenu.label} groups={submenu.submenu}/>}
     </div>
   );
 }
@@ -211,6 +199,8 @@ export default function App() {
       {screen === "social" && <AnSinhModule go={setScreen}/>}
       {screen === "khupho" && <KhuPhoModule go={setScreen}/>}
       {screen === "dulich" && <DuLichModule go={setScreen}/>}
+      {screen === "phananh" && <PhanAnhModule go={setScreen}/>}
+      {screen === "gioithieu" && <GioiThieuModule go={setScreen}/>}
     </main>
   );
 }
