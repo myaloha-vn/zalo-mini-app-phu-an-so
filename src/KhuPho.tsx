@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { WARD_NAMES } from "./wardNames";
+import { WARD_NAMES, shortWard } from "./wardNames";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
 import { PhanAnhForm, ReportList, ReportDetail, REPORTS, type Report } from "./PhanAnh";
 import { userPosts, byDateDesc } from "./DangBai";
@@ -178,7 +178,7 @@ function WardTile({ ward, onLocate, onDetail }: { ward: Ward; onLocate: () => vo
         <div className="icon-back" />
         <Icon name="home" size={26} />
       </div>
-      <div className="kp-tile-name">{ward.name}</div>
+      <div className="kp-tile-name"><small>Khu phố</small>{shortWard(ward.name)}</div>
       <div className="kp-tile-sub">{fmt(ward.households)} hộ</div>
     </Tap>
   );
