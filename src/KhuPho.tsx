@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { WARD_NAMES } from "./wardNames";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
 import { PhanAnhForm, ReportList, ReportDetail, REPORTS, type Report } from "./PhanAnh";
 import { userPosts, byDateDesc } from "./DangBai";
@@ -32,7 +33,7 @@ const CLUSTERS = ["Cụm 1", "Cụm 2", "Cụm 3"];
 
 export const WARDS: Ward[] = RAW.map(([population, households, area, residentRate], i) => ({
   id: i + 1,
-  name: `Khu phố ${i + 1}`,
+  name: WARD_NAMES[i],
   cluster: CLUSTERS[Math.floor(i / 5)],
   population,
   households,
@@ -199,7 +200,7 @@ function WardListScreen({ state, setState, go, openDetail }: { state: ListState;
       <div className="kp-body">
         <div className="kp-search">
           <Icon name="search" size={18} color="#7890A6" />
-          <input value={state.query} onChange={(e) => setState({ ...state, query: e.target.value })} placeholder="Tìm khu phố (vd: Khu phố 5)" />
+          <input value={state.query} onChange={(e) => setState({ ...state, query: e.target.value })} placeholder="Tìm khu phố (vd: Tân An 5)" />
           {state.query && <Tap className="kp-clear" onClick={() => setState({ ...state, query: "" })}>×</Tap>}
         </div>
 

@@ -34,7 +34,7 @@ const POLICIES: Policy[] = [
 
 const PROGRAMS: Program[] = [
   { group: "Y tế", title: "Khám sức khoẻ miễn phí cho người cao tuổi", time: "05/07 – 06/07/2025", place: "Trạm Y tế phường Phú An", audience: "Người từ 60 tuổi trở lên", desc: "Khám tổng quát, đo huyết áp, đường huyết và tư vấn dinh dưỡng miễn phí." },
-  { group: "Bảo trợ xã hội", title: "Trao quà hỗ trợ hộ gia đình khó khăn", time: "10/07/2025", place: "Nhà văn hoá Khu phố 3", audience: "Hộ nghèo, hộ cận nghèo", desc: "Trao quà nhu yếu phẩm và tiền hỗ trợ cho các hộ có hoàn cảnh khó khăn." },
+  { group: "Bảo trợ xã hội", title: "Trao quà hỗ trợ hộ gia đình khó khăn", time: "10/07/2025", place: "Nhà văn hoá Khu phố Tân An 5", audience: "Hộ nghèo, hộ cận nghèo", desc: "Trao quà nhu yếu phẩm và tiền hỗ trợ cho các hộ có hoàn cảnh khó khăn." },
   { group: "Việc làm", title: "Ngày hội việc làm phường Phú An 2025", time: "12/07/2025", place: "Hội trường UBND phường", audience: "Người lao động từ 18 tuổi", desc: "Kết nối trực tiếp với doanh nghiệp đang tuyển dụng trên địa bàn." },
   { group: "Người có công", title: "Thăm hỏi, tặng quà gia đình chính sách dịp 27/7", time: "20/07 – 27/07/2025", place: "Tại gia đình", audience: "Người có công và thân nhân", desc: "Lãnh đạo phường thăm hỏi, tặng quà các gia đình chính sách trên địa bàn." },
   { group: "Giáo dục", title: "Trao học bổng “Tiếp sức đến trường”", time: "15/08/2025", place: "Nhà văn hoá phường", audience: "Học sinh có hoàn cảnh khó khăn", desc: "Trao học bổng, dụng cụ học tập cho học sinh vượt khó học tốt." },

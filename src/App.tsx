@@ -5,6 +5,7 @@ import AnSinhModule from "./AnSinh";
 import DuLichModule from "./DuLich";
 import PhanAnhModule from "./PhanAnh";
 import GioiThieuModule from "./GioiThieu";
+import { WARD_NAMES } from "./wardNames";
 import DangBaiScreen, { userPosts, byDateDesc } from "./DangBai";
 import { NewsDetail, ScopeTag, ALL_WARD, type NewsItem } from "./news";
 import quocHuy from "./assets/quoc-huy.png";
@@ -134,7 +135,7 @@ const allNews = () => [...userPosts, ...news].sort(byDateDesc);
 function AllNewsScreen({ go, onBack, onOpen, filter, setFilter }: { go: (s: Screen) => void; onBack: () => void; onOpen: (n: NewsItem) => void; filter: string; setFilter: (f: string) => void }) {
   const items = allNews();
   const wards = Array.from(new Set(items.map((n) => n.scope).filter((s): s is string => !!s && s !== ALL_WARD)))
-    .sort((a, b) => Number(a.replace(/\D/g, "")) - Number(b.replace(/\D/g, "")));
+    .sort((a, b) => WARD_NAMES.indexOf(a) - WARD_NAMES.indexOf(b));
   const chips = ["Tất cả", ALL_WARD, ...wards];
   const shown = items.filter((n) => filter === "Tất cả" || (n.scope ?? ALL_WARD) === filter);
   return (

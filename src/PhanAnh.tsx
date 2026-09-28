@@ -1,6 +1,7 @@
 import { useRef, useState, type ChangeEvent, type ReactElement } from "react";
 import { Icon, Tap, Topbar, type Screen } from "./ui";
 import { WARDS, WardMap } from "./KhuPho";
+import { WARD_NAMES, shortWard } from "./wardNames";
 
 /* ---------------- Gửi phản ánh kiến nghị ----------------
    Bản demo: chưa gửi lên máy chủ. Khi tích hợp:
@@ -255,18 +256,18 @@ export const REPORTS: Report[] = [
   {
     code: "PA-DEMO-0412", category: "Điện – chiếu sáng công cộng", wardId: 8, mine: true, photos: [],
     content: "Đèn chiếu sáng đầu hẻm 12 bị hỏng nhiều ngày, buổi tối rất tối, người dân đi lại khó khăn.",
-    location: "Đầu hẻm 12, Khu phố 8, Phường Phú An",
+    location: "Đầu hẻm 12, Khu phố Hiệp An 4, Phường Phú An",
     reporter: { name: DEMO_RESIDENT.name, phone: DEMO_RESIDENT.phone, address: DEMO_RESIDENT.address },
     status: "Đã tiếp nhận", createdAt: daysAgo(2, 8),
-    history: [{ at: daysAgo(2, 8), status: "Đã tiếp nhận", note: "Hệ thống chuyển tới Khu phố 8" }],
+    history: [{ at: daysAgo(2, 8), status: "Đã tiếp nhận", note: "Hệ thống chuyển tới Khu phố Hiệp An 4" }],
   },
   {
     code: "PA-DEMO-1033", category: "Môi trường – vệ sinh", wardId: 8, mine: true, photos: [],
     content: "Rác thải tập kết không đúng nơi quy định ở đầu hẻm, bốc mùi vào buổi trưa.",
-    location: "Hẻm 5, Khu phố 8, Phường Phú An",
+    location: "Hẻm 5, Khu phố Hiệp An 4, Phường Phú An",
     reporter: { name: DEMO_RESIDENT.name, phone: DEMO_RESIDENT.phone, address: DEMO_RESIDENT.address },
     status: "Đã tiếp nhận", createdAt: daysAgo(1, 10),
-    history: [{ at: daysAgo(1, 10), status: "Đã tiếp nhận", note: "Hệ thống chuyển tới Khu phố 8" }],
+    history: [{ at: daysAgo(1, 10), status: "Đã tiếp nhận", note: "Hệ thống chuyển tới Khu phố Hiệp An 4" }],
   },
 ];
 
@@ -279,13 +280,13 @@ const WARD_SAMPLES: [string, string, string, ReportStatus, number][] = [
 for (let w = 1; w <= 15; w++) {
   WARD_SAMPLES.forEach(([category, content, place, status, ago], i) => {
     const created = daysAgo(ago + (w % 3), 8 + i);
-    const history: Report["history"] = [{ at: created, status: "Đã tiếp nhận", note: `Hệ thống chuyển tới Khu phố ${w}` }];
+    const history: Report["history"] = [{ at: created, status: "Đã tiếp nhận", note: `Hệ thống chuyển tới ${WARD_NAMES[w - 1]}` }];
     if (status !== "Đã tiếp nhận") history.push({ at: daysAgo(ago - 1 + (w % 3), 14), status: "Đang xử lý", note: "Trưởng khu phố đã tiếp nhận, phối hợp đơn vị liên quan xử lý" });
     if (status === "Đã xử lý") history.push({ at: daysAgo(ago - 3 + (w % 3), 16), status: "Đã xử lý", note: "Đã khắc phục xong" });
     REPORTS.push({
-      code: `PA-KP${String(w).padStart(2, "0")}-${i + 1}`, category, content, location: `${place}, Khu phố ${w}, Phường Phú An`, wardId: w,
+      code: `PA-KP${String(w).padStart(2, "0")}-${i + 1}`, category, content, location: `${place}, ${WARD_NAMES[w - 1]}, Phường Phú An`, wardId: w,
       photos: [], mine: false, status, createdAt: created, history,
-      reporter: { name: "Người dân (dữ liệu minh hoạ)", phone: `0900 000 ${String(300 + w * 3 + i)}`, address: `Khu phố ${w}` },
+      reporter: { name: "Người dân (dữ liệu minh hoạ)", phone: `0900 000 ${String(300 + w * 3 + i)}`, address: WARD_NAMES[w - 1] },
     });
   });
 }
@@ -465,7 +466,7 @@ export default function PhanAnhModule({ go }: { go: (s: Screen) => void }) {
           <div className="an-chips pk-ward-chips">
             {[0, ...Array.from(new Set(pending.map((r) => r.wardId))).sort((a, b) => a - b)].map((w) => (
               <Tap key={w} className={`db-chip ${wardFilter === w ? "on" : ""}`} onClick={() => setWardFilter(w)}>
-                {w === 0 ? `Tất cả (${pending.length})` : `KP ${w} (${pending.filter((r) => r.wardId === w).length})`}
+                {w === 0 ? `Tất cả (${pending.length})` : `${shortWard(WARD_NAMES[w - 1])} (${pending.filter((r) => r.wardId === w).length})`}
               </Tap>
             ))}
           </div>
