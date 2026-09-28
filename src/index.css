@@ -540,3 +540,21 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .gt-cat { display: inline-block; margin-bottom: 3px; color: #1677d2; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
 .gt-sum { margin-top: 3px; color: #8a9aa8; font-size: 11.5px; line-height: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .gt-item .news-copy { flex: 1; }
+
+/* Trưởng khu phố đăng bài */
+.news-heading-title { display: inline-flex; align-items: center; gap: 8px; }
+.news-pen { width: 24px; height: 24px; border-radius: 8px; background: #e4f1fb; color: #1677d2; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.db-author { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 12px 14px; border-radius: 14px; background: #edf6fe; border: 1px solid #cfe4f7; }
+.db-author > div:last-child { display: flex; flex-direction: column; gap: 2px; }
+.db-author b { color: var(--navy); font-size: 14px; }
+.db-author span { color: #6f8497; font-size: 11.5px; }
+.db-avatar { width: 38px; height: 38px; border-radius: 50%; background: #1677d2; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+.db-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.db-chip { padding: 7px 14px; border-radius: 999px; border: 1px solid #d9e5ee; color: #5e778c; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.db-chip.on { background: #1677d2; border-color: #1677d2; color: #fff; }
+.db-input { width: 100%; height: 46px; padding: 0 12px; border: 1px solid #e1e9f0; border-radius: 11px; background: #f7fafc; color: var(--navy); font: inherit; font-size: 13.5px; }
+.db-short { min-height: 64px; }
+.db-cover { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; }
+.db-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.db-cover-add { height: 110px; border-radius: 12px; border: 1.5px dashed #c9d4dd; color: #98a8b6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.db-note { margin: 12px 2px 0; }
