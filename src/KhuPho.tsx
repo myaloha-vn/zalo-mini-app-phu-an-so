@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
-import PhanAnhModule from "./PhanAnh";
+import { PhanAnhForm } from "./PhanAnh";
 import { userPosts, byDateDesc } from "./DangBai";
 import { NewsDetail, type NewsItem } from "./news";
 
@@ -429,7 +429,7 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
   ];
 
   if (article) return <NewsDetail item={article} onBack={() => setArticle(null)} go={go} />;
-  if (reporting) return <PhanAnhModule go={go} initialWardId={ward.id} onBack={() => setReporting(false)} />;
+  if (reporting) return <PhanAnhForm go={go} initialWardId={ward.id} onBack={() => setReporting(false)} />;
 
   return (
     <div className="screen kp-screen">
