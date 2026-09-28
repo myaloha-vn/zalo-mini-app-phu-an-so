@@ -266,7 +266,7 @@ function spaceData(w: Ward): Record<string, Post[]> {
 
 /* ---------------- Hồ sơ an sinh trên bản đồ ---------------- */
 // DỮ LIỆU MINH HOẠ (tên, hoàn cảnh là giả định). Hồ sơ an sinh thật là dữ liệu cá nhân nhạy cảm:
-// chỉ hiển thị cho cán bộ đã đăng nhập & được phân quyền, lấy qua API có kiểm soát truy cập.
+// TODO trước khi dùng dữ liệu thật: chỉ hiển thị cho cán bộ đã đăng nhập & được phân quyền, lấy qua API có kiểm soát truy cập.
 
 type WelfareStatus = "Đang hỗ trợ" | "Đang theo dõi" | "Chờ xét duyệt";
 type Welfare = {
@@ -357,22 +357,12 @@ function WelfareDetail({ item, onBack }: { item: Welfare; onBack: () => void }) 
 }
 
 function WelfareMapPanel({ ward }: { ward: Ward }) {
-  const [unlocked, setUnlocked] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [detail, setDetail] = useState(false);
   const items = welfareData(ward);
   const cur = selected !== null ? items[selected] : null;
 
-  if (!unlocked) {
-    return (
-      <div className="kp-panel as-lock">
-        <DuotoneIcon icon="user" color="blue" small />
-        <div className="as-lock-title">Dành cho cán bộ được phân quyền</div>
-        <p>Hồ sơ an sinh chứa thông tin cá nhân của người dân nên chỉ hiển thị khi cán bộ đăng nhập.</p>
-        <Tap className="as-btn solid" onClick={() => setUnlocked(true)}>Đăng nhập cán bộ (demo)</Tap>
-      </div>
-    );
-  }
+
 
   const close = () => { setSelected(null); setDetail(false); };
   return (
