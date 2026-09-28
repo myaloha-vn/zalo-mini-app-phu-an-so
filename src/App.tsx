@@ -6,7 +6,7 @@ import DuLichModule from "./DuLich";
 import PhanAnhModule from "./PhanAnh";
 import GioiThieuModule from "./GioiThieu";
 import DangBaiScreen, { userPosts, byDateDesc } from "./DangBai";
-import { NewsDetail, ScopeTag, type NewsItem } from "./news";
+import { NewsDetail, ScopeTag, ALL_WARD, type NewsItem } from "./news";
 import quocHuy from "./assets/quoc-huy.png";
 import khuPhoIcon from "./assets/khu-pho-so-v2.png";
 import quyHoachIcon from "./assets/tra-cuu-quy-hoach.png";
@@ -120,13 +120,50 @@ const news: NewsItem[] = [
 ];
 
 
+function NewsRow({ item, onOpen }: { item: NewsItem; onOpen: () => void }) {
+  return (
+    <Tap className="news-item" onClick={onOpen}>
+      {item.image ? <img className="news-thumb news-thumb-img" src={item.image} alt=""/> : <div className={`news-thumb ${item.tone}`}><div className="news-building"/><div className="news-tree"/></div>}
+      <div className="news-copy"><div className="news-title">{item.title}</div><div className="news-date"><ScopeTag scope={item.scope}/><Icon name="calendar" size={12}/>{item.date}</div></div>
+    </Tap>
+  );
+}
+
+const allNews = () => [...userPosts, ...news].sort(byDateDesc);
+
+function AllNewsScreen({ go, onBack, onOpen, filter, setFilter }: { go: (s: Screen) => void; onBack: () => void; onOpen: (n: NewsItem) => void; filter: string; setFilter: (f: string) => void }) {
+  const items = allNews();
+  const wards = Array.from(new Set(items.map((n) => n.scope).filter((s): s is string => !!s && s !== ALL_WARD)))
+    .sort((a, b) => Number(a.replace(/\D/g, "")) - Number(b.replace(/\D/g, "")));
+  const chips = ["Tất cả", ALL_WARD, ...wards];
+  const shown = items.filter((n) => filter === "Tất cả" || (n.scope ?? ALL_WARD) === filter);
+  return (
+    <div className="screen news-screen">
+      <Topbar title="Tin tức - Sự kiện" onBack={onBack}/>
+      <div className="news-detail an-body">
+        <div className="an-chips">
+          {chips.map((c) => <Tap key={c} className={`db-chip ${c === filter ? "on" : ""}`} onClick={() => setFilter(c)}>{c}</Tap>)}
+        </div>
+        <div className="an-count">{shown.length} bài viết</div>
+        <div className="news-list">
+          {shown.map((item) => <NewsRow key={item.title} item={item} onOpen={() => onOpen(item)}/>)}
+        </div>
+      </div>
+      <BottomNav active="Trang chủ" go={go}/>
+    </div>
+  );
+}
+
 function HomeScreen({ go }: { go: (screen: Screen) => void }) {
   const [utils, setUtils] = useState(false);
   const [submenu, setSubmenu] = useState<Utility | null>(null);
   const [article, setArticle] = useState<NewsItem | null>(null);
   const [composing, setComposing] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const [newsFilter, setNewsFilter] = useState("Tất cả");
   if (composing) return <DangBaiScreen onBack={() => setComposing(false)} onPublished={(p) => { setComposing(false); setArticle(p); }}/>;
   if (article) return <NewsDetail item={article} onBack={() => setArticle(null)} go={go}/>;
+  if (showAll) return <AllNewsScreen go={go} onBack={() => setShowAll(false)} onOpen={setArticle} filter={newsFilter} setFilter={setNewsFilter}/>;
   return (
     <div className="screen home-screen">
       <Header />
@@ -152,14 +189,9 @@ function HomeScreen({ go }: { go: (screen: Screen) => void }) {
           ))}
         </div>
 
-        <div className="section-heading news-heading"><span className="news-heading-title">Tin tức - Sự kiện<Tap className="news-pen" onClick={() => setComposing(true)}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-label="Đăng bài"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg></Tap></span><Tap className="view-all">Xem tất cả <Icon name="arrow" size={13}/></Tap></div>
+        <div className="section-heading news-heading"><span className="news-heading-title">Tin tức - Sự kiện<Tap className="news-pen" onClick={() => setComposing(true)}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-label="Đăng bài"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg></Tap></span><Tap className="view-all" onClick={() => setShowAll(true)}>Xem tất cả <Icon name="arrow" size={13}/></Tap></div>
         <div className="news-list">
-          {[...userPosts, ...news].sort(byDateDesc).map((item) => (
-            <Tap className="news-item" key={item.title} onClick={() => setArticle(item)}>
-              {item.image ? <img className="news-thumb news-thumb-img" src={item.image} alt=""/> : <div className={`news-thumb ${item.tone}`}><div className="news-building"/><div className="news-tree"/></div>}
-              <div className="news-copy"><div className="news-title">{item.title}</div><div className="news-date"><ScopeTag scope={item.scope}/><Icon name="calendar" size={12}/>{item.date}</div></div>
-            </Tap>
-          ))}
+          {allNews().slice(0, 4).map((item) => <NewsRow key={item.title} item={item} onOpen={() => setArticle(item)}/>)}
         </div>
       </div>
       <BottomNav active="Trang chủ" go={go}/>

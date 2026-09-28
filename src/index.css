@@ -616,3 +616,10 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .pk-guide-step p { margin: 2px 0 0; color: #5e778c; font-size: 12.5px; line-height: 18px; }
 .pk-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .pk-flow em { margin: 0 4px; color: #98a8b6; font-style: normal; }
+
+/* Tất cả tin tức */
+.an-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.an-chips::-webkit-scrollbar { display: none; }
+.an-chips .db-chip { flex: 0 0 auto; background: var(--surface); }
+.an-chips .db-chip.on { background: #1677d2; }
+.an-count { margin: 12px 2px 8px; color: #8a9aa8; font-size: 12px; }
