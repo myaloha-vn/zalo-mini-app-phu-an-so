@@ -177,7 +177,6 @@ function WardTile({ ward, onLocate, onDetail }: { ward: Ward; onLocate: () => vo
       <div className={`duotone ${tone} kp-tile-icon`}>
         <div className="icon-back" />
         <Icon name="home" size={26} />
-        <b className="kp-tile-num"><span>{pad(ward.id)}</span></b>
       </div>
       <div className="kp-tile-name">{ward.name}</div>
       <div className="kp-tile-sub">{fmt(ward.households)} hộ</div>
