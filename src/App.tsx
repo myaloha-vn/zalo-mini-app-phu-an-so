@@ -262,7 +262,7 @@ function NotificationsScreen({ go }: { go: (s: Screen) => void }) {
     );
   }
 
-  const mine = REPORTS.filter((r) => r.wardId === DEMO_AUTHOR_WARD).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const mine = REPORTS.filter((r) => r.wardId === DEMO_AUTHOR_WARD && r.status === "Đã tiếp nhận").sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   const unread = mine.filter((r) => r.status === "Đã tiếp nhận").length;
   const items = allNews();
 
@@ -276,14 +276,14 @@ function NotificationsScreen({ go }: { go: (s: Screen) => void }) {
       <div className="nt-body">
         {tab === "me" ? (
           <>
-            <div className="nt-role"><Icon name="user" size={14}/>Trưởng {wardName} · nhận thông báo khi khu phố có phản ánh mới (demo)</div>
+            <div className="nt-role"><Icon name="user" size={14}/>Trưởng {wardName} · phản ánh chờ xử lý của khu phố (demo)</div>
             {mine.map((r) => {
               const isNew = r.status === "Đã tiếp nhận";
               return (
                 <Tap className={`nt-item ${isNew ? "unread" : ""}`} key={r.code} onClick={() => setReport(r)}>
                   <span className={`nt-ic ${isNew ? "orange" : r.status === "Đang xử lý" ? "blue" : "green"}`}><Icon name={isNew ? "alert" : "check"} size={17} color="#fff"/></span>
                   <div className="nt-copy">
-                    <b>{isNew ? "Phản ánh mới cần xử lý" : r.status === "Đang xử lý" ? "Phản ánh đang xử lý" : "Phản ánh đã xử lý xong"}</b>
+                    <b>Phản ánh chờ xử lý</b>
                     <p>{r.category}: {r.content}</p>
                     <span>{r.code} · {timeAgo(r.createdAt)}</span>
                   </div>
@@ -291,7 +291,7 @@ function NotificationsScreen({ go }: { go: (s: Screen) => void }) {
                 </Tap>
               );
             })}
-            {mine.length === 0 && <div className="pk-empty">Chưa có thông báo.</div>}
+            {mine.length === 0 && <div className="pk-empty">Không có phản ánh nào chờ xử lý.</div>}
           </>
         ) : (
           <>
