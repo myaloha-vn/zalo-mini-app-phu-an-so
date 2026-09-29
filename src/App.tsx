@@ -1,4 +1,5 @@
 import { useState } from "react";
+import MapSoScreen from "./MapSo";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, UtilitySheet, UtilityTile, UTILITY_GROUPS, openUtility, type Screen, type IconName, type Utility } from "./ui";
 import KhuPhoModule from "./KhuPho";
 import AnSinhModule from "./AnSinh";
@@ -326,7 +327,7 @@ export default function App() {
       {screen === "phananh" && <PhanAnhModule go={setScreen}/>}
       {screen === "gioithieu" && <GioiThieuModule go={setScreen}/>}
       {screen === "canhan" && <CaNhanScreen go={setScreen}/>}
-      {screen === "bando" && <KhuPhoModule go={setScreen} mapMode/>}
+      {screen === "bando" && <MapSoScreen go={setScreen} />}
       {screen === "phananh:track" && <PhanAnhModule go={setScreen} initialView="track" exitTo="canhan"/>}
       {screen === "phananh:handle" && <PhanAnhModule go={setScreen} initialView="handle" exitTo="canhan"/>}
       {screen === "thongbao" && <NotificationsScreen go={setScreen}/>}
