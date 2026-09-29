@@ -211,8 +211,13 @@ export default function AnSinhModule({ go }: { go: (s: Screen) => void }) {
           {query && <Tap className="kp-clear" onClick={() => setQuery("")}>×</Tap>}
         </div>
 
-        <div className="chips as-group-wrap">
-          {GROUPS.map((g) => <Tap key={g} className={`chip ${group === g ? "selected" : ""}`} onClick={() => setGroup(g)}>{g}</Tap>)}
+        <div className="as-group-select">
+          <label>Nhóm chính sách</label>
+          <div className="pa-select">
+            <select value={group} onChange={(e) => setGroup(e.target.value as (typeof GROUPS)[number])}>
+              {GROUPS.map((g) => <option key={g} value={g}>{g === "Tất cả" ? "Tất cả nhóm chính sách" : g}</option>)}
+            </select>
+          </div>
         </div>
 
         <div className="policy-count"><span>Chính sách an sinh</span><small>{policies.length} chính sách</small></div>

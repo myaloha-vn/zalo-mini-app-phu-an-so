@@ -646,3 +646,6 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .chips.as-group-wrap { flex-wrap: wrap; overflow: visible; margin: 14px 0 0; padding: 0; gap: 8px; }
 .as-group-wrap .chip { height: 36px; padding: 0 14px; font-size: 12.5px; }
 .rg-confirm .pa-select select { height: 46px; padding: 0 36px 0 12px; border: 1px solid #e1e9f0; border-radius: 11px; background: #f7fafc; color: var(--navy); font: inherit; font-size: 14px; width: 100%; appearance: none; -webkit-appearance: none; }
+.as-group-select { margin-top: 14px; }
+.as-group-select label { display: block; margin: 0 2px 6px; color: #5e778c; font-size: 12.5px; font-weight: 700; }
+.as-group-select select { width: 100%; height: 46px; padding: 0 38px 0 14px; border: 1px solid #cfe0ee; border-radius: 12px; background: var(--surface); color: var(--navy); font: inherit; font-size: 14px; font-weight: 600; appearance: none; -webkit-appearance: none; box-shadow: 0 2px 8px rgba(25,82,124,.05); }
