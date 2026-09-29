@@ -4,7 +4,7 @@ import dichVuCongIcon from "./assets/dich-vu-cong.png";
 import phanAnhIcon from "./assets/phan-anh-kien-nghi-v3.png";
 import chatbotIcon from "./assets/chatbot-ai-v2.png";
 
-export type Screen = "home" | "map" | "social" | "khupho" | "dulich" | "phananh" | "gioithieu" | "thongbao";
+export type Screen = "home" | "map" | "social" | "khupho" | "dulich" | "phananh" | "gioithieu" | "thongbao" | "canhan" | "phananh:track" | "phananh:handle";
 export type IconName =
   | "chat"
   | "leaf"
@@ -180,7 +180,7 @@ const navItems: { label: string; icon: IconName; screen?: Screen }[] = [
   { label: "Trang chủ", icon: "home", screen: "home" },
   { label: "Tiện ích", icon: "grid" },
   { label: "Bản đồ", icon: "map", screen: "map" },
-  { label: "Cá nhân", icon: "user", screen: "home" },
+  { label: "Cá nhân", icon: "user", screen: "canhan" },
 ];
 
 export function BottomNav({ active, go }: { active: string; go: (screen: Screen) => void }) {

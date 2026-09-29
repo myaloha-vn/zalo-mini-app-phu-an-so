@@ -93,6 +93,9 @@ function ProgramCard({ p, onDetail, wide = false }: { p: Program; onDetail: () =
 
 type Detail = { kind: "policy"; item: Policy } | { kind: "program"; item: Program };
 
+/** Đăng ký an sinh của người dùng trong phiên (demo). Khi tích hợp: lấy từ API. */
+export const REGISTRATIONS: { title: string; group: string; ward: string; date: string }[] = [];
+
 function DetailSheet({ detail, onClose }: { detail: Detail; onClose: () => void }) {
   const st = GROUP_STYLE[detail.item.group];
   // Bước đăng ký: xem thông tin → xác nhận họ tên, SĐT (tự điền từ tài khoản) → thành công.
@@ -108,7 +111,13 @@ function DetailSheet({ detail, onClose }: { detail: Detail; onClose: () => void 
     detail.kind === "policy"
       ? [["people", "Đối tượng", detail.item.audience], ["check", "Trạng thái", detail.item.status], ["location", "Nơi tiếp nhận", "Bộ phận Một cửa – UBND phường Phú An"]]
       : [["calendar", "Thời gian", detail.item.time], ["location", "Địa điểm", detail.item.place], ["people", "Đối tượng", detail.item.audience]];
-  const submit = () => { setTried(true); if (nameOk && phoneOk) setStep("done"); };
+  const submit = () => {
+    setTried(true);
+    if (!(nameOk && phoneOk)) return;
+    const d = new Date();
+    REGISTRATIONS.unshift({ title: detail.item.title, group: detail.item.group, ward: WARD_NAMES[wardId - 1], date: `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}` });
+    setStep("done");
+  };
   return (
     <div className="as-backdrop" onClick={onClose}>
       <div className="as-sheet" onClick={(e) => e.stopPropagation()}>

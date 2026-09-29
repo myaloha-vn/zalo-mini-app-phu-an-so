@@ -5,6 +5,7 @@ import AnSinhModule from "./AnSinh";
 import DuLichModule from "./DuLich";
 import PhanAnhModule from "./PhanAnh";
 import GioiThieuModule from "./GioiThieu";
+import CaNhanScreen from "./CaNhan";
 import { WARD_NAMES } from "./wardNames";
 import DangBaiScreen, { userPosts, byDateDesc, DEMO_AUTHOR_WARD } from "./DangBai";
 import { REPORTS, ReportDetail, type Report } from "./PhanAnh";
@@ -324,6 +325,9 @@ export default function App() {
       {screen === "dulich" && <DuLichModule go={setScreen}/>}
       {screen === "phananh" && <PhanAnhModule go={setScreen}/>}
       {screen === "gioithieu" && <GioiThieuModule go={setScreen}/>}
+      {screen === "canhan" && <CaNhanScreen go={setScreen}/>}
+      {screen === "phananh:track" && <PhanAnhModule go={setScreen} initialView="track" exitTo="canhan"/>}
+      {screen === "phananh:handle" && <PhanAnhModule go={setScreen} initialView="handle" exitTo="canhan"/>}
       {screen === "thongbao" && <NotificationsScreen go={setScreen}/>}
     </main>
   );

@@ -413,8 +413,8 @@ function Guide() {
 
 type View = { name: "hub" | "form" | "track" | "handle" | "guide" } | { name: "detail"; report: Report; staff: boolean; from: "track" | "handle" };
 
-export default function PhanAnhModule({ go }: { go: (s: Screen) => void }) {
-  const [view, setView] = useState<View>({ name: "hub" });
+export default function PhanAnhModule({ go, initialView, exitTo = "home" }: { go: (s: Screen) => void; initialView?: "track" | "handle"; exitTo?: Screen }) {
+  const [view, setView] = useState<View>({ name: initialView ?? "hub" });
   const [, setTick] = useState(0);
   const [wardFilter, setWardFilter] = useState(0);
   const refresh = () => setTick((t) => t + 1);
@@ -426,7 +426,7 @@ export default function PhanAnhModule({ go }: { go: (s: Screen) => void }) {
   const inMonth = REPORTS.filter((r) => r.createdAt.getMonth() === month.getMonth() && r.createdAt.getFullYear() === month.getFullYear());
   const pending = REPORTS.filter((r) => r.status !== "Đã xử lý");
   const titles: Record<string, string> = { hub: "Phản ánh kiến nghị", track: "Theo dõi phản ánh", handle: "Xử lý phản ánh", guide: "Hướng dẫn gửi phản ánh", detail: view.name === "detail" ? view.report.code : "" };
-  const back = view.name === "hub" ? () => go("home") : view.name === "detail" ? () => setView({ name: view.from }) : hub;
+  const back = view.name === "hub" || view.name === initialView ? () => go(exitTo) : view.name === "detail" ? () => setView({ name: view.from }) : hub;
 
   return (
     <div className="screen pa-screen">
