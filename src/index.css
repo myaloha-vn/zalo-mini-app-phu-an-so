@@ -199,7 +199,7 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .kp-map-card { padding: 10px; }
 .kp-map-mini { height: 150px; border-radius: 11px; }
 .kp-map-btn { margin-top: 10px; }
-.kp-tabs { display: grid; grid-template-columns: repeat(4, 1fr); padding: 3px; border-radius: 11px; background: #e7f0f7; margin-bottom: 12px; }
+.kp-tabs { display: grid; grid-template-columns: 1.4fr 1fr 1fr; padding: 3px; border-radius: 11px; background: #e7f0f7; margin-bottom: 12px; }
 .kp-tabs > div { min-height: 36px; padding: 2px 4px; border-radius: 9px; display: flex; align-items: center; justify-content: center; text-align: center; color: #5e778c; font-size: 11px; font-weight: 600; cursor: pointer; }
 .kp-tabs > div.on { background: var(--surface); color: var(--blue); font-weight: 700; box-shadow: 0 2px 6px rgba(24,91,139,.12); }
 .kp-posts .news-item { align-items: center; }
@@ -713,3 +713,9 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .cn-field { width: 100%; display: flex; align-items: center; gap: 10px; padding: 14px 2px; border-top: 1px solid var(--line); }
 .cn-field span { flex: 1; color: #6f8497; font-size: 13.5px; }
 .cn-field b { color: var(--navy); font-size: 15px; }
+
+.pa-done .pa-submit + .pa-submit { margin-top: 10px; }
+.pa-submit.pa-submit-ghost { background: #fff; color: var(--blue); border: 1.5px solid #bcd6ee; box-shadow: none; }
+.kp-pa-seg { display: flex; gap: 8px; margin-bottom: 10px; }
+.kp-pa-seg > div { flex: 1; padding: 8px 6px; border-radius: 10px; border: 1px solid #d6e4f0; background: #fff; color: #5e778c; font-size: 12px; font-weight: 600; text-align: center; cursor: pointer; }
+.kp-pa-seg > div.on { border-color: var(--blue); color: var(--blue); background: #eaf4fe; font-weight: 700; }

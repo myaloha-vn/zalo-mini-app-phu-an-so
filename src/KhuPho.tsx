@@ -247,15 +247,13 @@ type Post = { title: string; date: string; tag: string; icon: IconName; color: s
 
 function spaceData(w: Ward): Record<string, Post[]> {
   return {
-    "Tin tức": [
+    "Tin tức - Thông báo": [
+      { title: `Họp ${w.name} định kỳ tháng 7/2025 lúc 19h00`, date: "24/06/2025", tag: "Thông báo", icon: "megaphone", color: "purple" },
       { title: `${w.name} triển khai nhóm Zalo kết nối cư dân`, date: "21/06/2025", tag: "Khu phố số", icon: "document", color: "blue" },
       { title: "Tổng kết phong trào xây dựng đời sống văn hoá 6 tháng đầu năm", date: "16/06/2025", tag: "Văn hoá", icon: "document", color: "green" },
+      { title: "Tạm ngưng cấp điện để bảo trì lưới điện khu vực", date: "20/06/2025", tag: "Thông báo", icon: "megaphone", color: "orange" },
+      { title: "Thu phí vệ sinh môi trường quý III/2025", date: "17/06/2025", tag: "Thông báo", icon: "megaphone", color: "blue" },
       { title: "Lắp đặt thêm camera an ninh tại các tuyến hẻm", date: "12/06/2025", tag: "An ninh", icon: "document", color: "purple" },
-    ],
-    "Thông báo": [
-      { title: `Họp ${w.name} định kỳ tháng 7/2025 lúc 19h00`, date: "24/06/2025", tag: "Quan trọng", icon: "megaphone", color: "purple" },
-      { title: "Tạm ngưng cấp điện để bảo trì lưới điện khu vực", date: "20/06/2025", tag: "Điện lực", icon: "megaphone", color: "orange" },
-      { title: "Thu phí vệ sinh môi trường quý III/2025", date: "17/06/2025", tag: "Thu phí", icon: "megaphone", color: "blue" },
     ],
     "Hồ sơ an sinh": [],
     "Phản ánh": [],
@@ -413,11 +411,13 @@ function initials(name: string) {
 }
 
 function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBack: () => void; go: (s: Screen) => void; openFullMap: () => void }) {
-  const [tab, setTab] = useState("Tin tức");
+  const [tab, setTab] = useState("Tin tức - Thông báo");
+  const [paMode, setPaMode] = useState<"mine" | "staff">("mine");
   const [reporting, setReporting] = useState(false);
   const [article, setArticle] = useState<NewsItem | null>(null);
-  const [report, setReport] = useState<Report | null>(null);
+  const [report, setReport] = useState<{ r: Report; staff: boolean } | null>(null);
   const [, setTick] = useState(0);
+  const myWardReports = REPORTS.filter((r) => r.wardId === ward.id && r.mine).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   const wardReports = REPORTS.filter((r) => r.wardId === ward.id).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   const wardPosts = userPosts.filter((p) => p.scope === ward.name).sort(byDateDesc);
   const space = spaceData(ward);
@@ -430,14 +430,14 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
   if (report) {
     return (
       <div className="screen pa-screen">
-        <Topbar title={report.code} onBack={() => setReport(null)} />
-        <div className="pk-staff-note pk-kp-note"><Icon name="user" size={14} />Chế độ Trưởng {ward.name} (demo, chưa kiểm tra quyền)</div>
-        <ReportDetail r={report} staff onChange={() => setTick((x) => x + 1)} />
+        <Topbar title={report.r.code} onBack={() => setReport(null)} />
+        {report.staff && <div className="pk-staff-note pk-kp-note"><Icon name="user" size={14} />Chế độ Trưởng {ward.name} (demo, chưa kiểm tra quyền)</div>}
+        <ReportDetail r={report.r} staff={report.staff} onChange={() => setTick((x) => x + 1)} />
       </div>
     );
   }
   if (article) return <NewsDetail item={article} onBack={() => setArticle(null)} go={go} />;
-  if (reporting) return <PhanAnhForm go={go} initialWardId={ward.id} onBack={() => setReporting(false)} />;
+  if (reporting) return <PhanAnhForm go={go} initialWardId={ward.id} onBack={() => setReporting(false)} onTrack={(code) => { setReporting(false); setTab("Phản ánh"); setPaMode("mine"); const r = REPORTS.find((x) => x.code === code); if (r) setReport({ r, staff: false }); }} />;
 
   return (
     <div className="screen kp-screen">
@@ -496,8 +496,16 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
             <Icon name="arrow" size={15} />
           </Tap>
         )}
-        {tab === "Phản ánh" ? <ReportList items={wardReports} onOpen={setReport} empty="Khu phố chưa có phản ánh nào." /> : tab === "Hồ sơ an sinh" ? <WelfareMapPanel ward={ward} /> : <div className="news-list kp-posts">
-          {tab === "Tin tức" && wardPosts.map((p) => (
+        {tab === "Phản ánh" && (
+          <div className="kp-pa-seg">
+            <Tap className={paMode === "mine" ? "on" : ""} onClick={() => setPaMode("mine")}>Theo dõi phản ánh của tôi</Tap>
+            <Tap className={paMode === "staff" ? "on" : ""} onClick={() => setPaMode("staff")}>Xử lý (Trưởng KP)</Tap>
+          </div>
+        )}
+        {tab === "Phản ánh" ? (paMode === "mine"
+          ? <ReportList items={myWardReports} onOpen={(r) => setReport({ r, staff: false })} empty={`Bạn chưa gửi phản ánh nào tới ${ward.name}.`} />
+          : <ReportList items={wardReports} onOpen={(r) => setReport({ r, staff: true })} empty="Khu phố chưa có phản ánh nào." />) : tab === "Hồ sơ an sinh" ? <WelfareMapPanel ward={ward} /> : <div className="news-list kp-posts">
+          {tab === "Tin tức - Thông báo" && wardPosts.map((p) => (
             <Tap className="news-item" key={p.title} onClick={() => setArticle(p)}>
               {p.image ? <img className="news-thumb news-thumb-img kp-post-thumb" src={p.image} alt="" /> : <div className={`news-thumb kp-post-thumb ${p.tone}`}><div className="news-building" /><div className="news-tree" /></div>}
               <div className="news-copy">

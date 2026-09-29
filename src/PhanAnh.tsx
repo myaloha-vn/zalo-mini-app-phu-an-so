@@ -36,7 +36,7 @@ function PenIcon() {
 
 type Photo = { id: number; url: string };
 
-export function PhanAnhForm({ go, initialWardId, onBack, backLabel }: { go: (s: Screen) => void; initialWardId?: number; onBack?: () => void; backLabel?: string }) {
+export function PhanAnhForm({ go, initialWardId, onBack, backLabel, onTrack }: { go: (s: Screen) => void; initialWardId?: number; onBack?: () => void; backLabel?: string; onTrack?: (code: string) => void }) {
   const back = onBack ?? (() => go("home"));
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
@@ -107,7 +107,8 @@ export function PhanAnhForm({ go, initialWardId, onBack, backLabel }: { go: (s: 
           <p>Phản ánh của bạn đã được chuyển tới <b>{ward.name}</b>. Trưởng khu phố <b>{ward.head}</b> sẽ tiếp nhận và xử lý.</p>
           <div className="pa-code"><span>Mã phản ánh</span><b>{done}</b></div>
           <p className="pa-muted">Bạn có thể xem tiến độ trong mục “Theo dõi phản ánh”. (Bản demo – phản ánh chưa được gửi lên hệ thống.)</p>
-          <Tap className="pa-submit" onClick={back}>{backLabel ?? (onBack ? "Quay lại khu phố" : "Về trang chủ")}</Tap>
+          {onTrack && <Tap className="pa-submit" onClick={() => onTrack(done)}>Theo dõi phản ánh</Tap>}
+          <Tap className={onTrack ? "pa-submit pa-submit-ghost" : "pa-submit"} onClick={back}>{backLabel ?? (onBack ? "Quay lại khu phố" : "Về trang chủ")}</Tap>
         </div>
       </div>
     );
