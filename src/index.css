@@ -344,7 +344,7 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .dl-tl-name { color: #1b3b55; font-size: 12.5px; font-weight: 750; }
 .dl-tl-act { margin-top: 4px; color: #6d8294; font-size: 10.5px; line-height: 15px; }
 .dl-tl-dur { margin-top: 6px; color: #8a9aa7; font-size: 10.5px; display: flex; align-items: center; gap: 3px; }
-.dl-tour-body { padding-bottom: 150px; }
+.dl-tour-body { padding-bottom: 100px; }
 .dl-action-bar { position: absolute; z-index: 21; left: 0; right: 0; bottom: 67px; padding: 10px 16px; background: rgba(255,255,255,.97); border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 2.2fr; gap: 8px; }
 .dl-action-bar .kp-btn { height: 44px; }
 .dl-toast { position: absolute; z-index: 50; left: 50%; bottom: 132px; transform: translateX(-50%); max-width: 90%; padding: 9px 13px; border-radius: 12px; background: rgba(16,46,73,.92); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 7px; white-space: nowrap; box-shadow: 0 6px 18px rgba(16,46,73,.25); }

@@ -333,24 +333,7 @@ function PlaceScreen({ place, go, open, back }: { place: Place; go: (s: Screen) 
 }
 
 function TourScreen({ tour, go, open, back }: { tour: Tour; go: (s: Screen) => void; open: (v: View) => void; back: () => void }) {
-  const [step, setStep] = useState<number | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
   const stops = tour.stops.map((s) => ({ ...s, p: P(s.place) }));
-  const flash = (t: string) => { setToast(t); window.setTimeout(() => setToast(null), 2200); };
-
-  const share = async () => {
-    const text = `${tour.name} – ${tour.duration}, ${stops.length} điểm đến. Xem trên Phú An Số.`;
-    try {
-      if (navigator.share) { await navigator.share({ title: tour.name, text }); return; }
-      await navigator.clipboard.writeText(text);
-      flash("Đã sao chép thông tin hành trình");
-    } catch { flash("Đã sao chép thông tin hành trình"); }
-  };
-  const startOrNext = () => {
-    if (step === null) { setStep(0); flash(`Bắt đầu! Điểm 1: ${stops[0].p.name}`); return; }
-    if (step < stops.length - 1) { setStep(step + 1); flash(`Điểm ${step + 2}: ${stops[step + 1].p.name}`); return; }
-    setStep(null); flash("Hoàn thành hành trình. Cảm ơn bạn!");
-  };
 
   const facts: [IconName, string, string][] = [
     ["clock", "Thời lượng", tour.duration], ["location", "Số điểm đến", `${stops.length} điểm`], ["route", "Quãng đường", tour.distance],
@@ -359,7 +342,7 @@ function TourScreen({ tour, go, open, back }: { tour: Tour; go: (s: Screen) => v
 
   return (
     <div className="screen social-screen">
-      <Topbar title="Chi tiết hành trình" onBack={back} end={<Tap onClick={share}><Icon name="share" /></Tap>} />
+      <Topbar title="Chi tiết hành trình" onBack={back} />
       <div className="kp-body dl-detail dl-tour-body">
         <div className="dl-cover-wrap"><Cover cat={tour.cat} big><span className="dl-cover-chip"><Icon name="route" size={12} />Hành trình gợi ý</span></Cover></div>
         <div className="dl-title-block">
@@ -374,12 +357,12 @@ function TourScreen({ tour, go, open, back }: { tour: Tour; go: (s: Screen) => v
         </div>
 
         <div className="section-heading"><span>Bản đồ lộ trình</span><small className="dl-muted">{stops.map((_, i) => i + 1).join(" → ")}</small></div>
-        <div className="kp-panel kp-map-card"><ExploreMap route={stops.map((s) => s.p)} activeStep={step ?? undefined} height={210} /></div>
+        <div className="kp-panel kp-map-card"><ExploreMap route={stops.map((s) => s.p)} height={210} /></div>
 
         <div className="section-heading"><span>Lịch trình</span></div>
         <div className="dl-timeline">
           {stops.map((s, i) => (
-            <div className={`dl-tl ${step === i ? "now" : ""} ${step !== null && i < step ? "done" : ""}`} key={s.place}>
+            <div className="dl-tl" key={s.place}>
               <div className="dl-tl-time">{s.time}</div>
               <div className="dl-tl-rail"><i>{i + 1}</i></div>
               <Tap className="dl-tl-card" onClick={() => open({ name: "place", id: s.p.id })}>
@@ -397,14 +380,6 @@ function TourScreen({ tour, go, open, back }: { tour: Tour; go: (s: Screen) => v
         <Tap className="kp-btn ghost as-all-btn" onClick={() => open({ name: "places" })}>Xem tất cả điểm đến<Icon name="arrow" size={14} /></Tap>
       </div>
 
-      <div className="dl-action-bar">
-        <Tap className="kp-btn ghost" onClick={share}><Icon name="share" size={15} />Chia sẻ</Tap>
-        <Tap className="kp-btn solid" onClick={startOrNext}>
-          <Icon name="navigation" size={15} />
-          {step === null ? "Bắt đầu hành trình" : step < stops.length - 1 ? `Đang ở điểm ${step + 1}/${stops.length} · Tiếp theo` : "Hoàn thành hành trình"}
-        </Tap>
-      </div>
-      {toast && <Toast text={toast} />}
       <BottomNav active="Trang chủ" go={go} />
     </div>
   );
