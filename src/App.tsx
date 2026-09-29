@@ -228,22 +228,18 @@ function HomeScreen({ go }: { go: (screen: Screen) => void }) {
 const PLANNING_URL = "https://gisxaydung.tphcm.gov.vn/tracuuttqh";
 
 function MapScreen({ go }: { go: (s: Screen) => void }) {
-  const [loaded, setLoaded] = useState(false);
   const openOriginal = () => window.open(PLANNING_URL, "_blank", "noopener");
   return (
     <div className="screen map-screen">
       <Topbar title="Tra cứu quy hoạch" onBack={() => go("home")} end={<Tap onClick={openOriginal}><Icon name="share" size={20}/></Tap>}/>
-      <div className="planning-frame">
-        {!loaded && (
-          <div className="planning-loading">
-            <div className="planning-spinner"/>
-            <span>Đang tải bản đồ quy hoạch...</span>
-            <Tap className="kp-btn ghost planning-open" onClick={openOriginal}>Mở trang tra cứu gốc</Tap>
-          </div>
-        )}
-        <iframe src={PLANNING_URL} title="Tra cứu thông tin quy hoạch TP.HCM" onLoad={() => setLoaded(true)} allow="geolocation; fullscreen" referrerPolicy="no-referrer-when-downgrade"/>
+      <div className="planning-frame planning-frame-info">
+        <div className="planning-info">
+          <Icon name="map" size={48}/>
+          <h3>Tra cứu thông tin quy hoạch TP.HCM</h3>
+          <p>Bản đồ quy hoạch được cung cấp bởi hệ thống GIS Quy hoạch Xây dựng TP.HCM. Nhấn nút bên dưới để mở trang tra cứu chính thức.</p>
+          <Tap className="kp-btn planning-open" onClick={openOriginal}><Icon name="share" size={18}/> Mở trang tra cứu gốc</Tap>
+        </div>
       </div>
-      <Tap className="planning-fallback" onClick={openOriginal}><Icon name="info" size={15}/>Không hiển thị bản đồ? <b>Mở trang tra cứu gốc</b></Tap>
       <BottomNav active="Trang chủ" go={go}/>
     </div>
   );

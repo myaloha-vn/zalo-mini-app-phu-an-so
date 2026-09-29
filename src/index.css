@@ -392,16 +392,13 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .feature-card.purple { background: linear-gradient(150deg, #f4f1ff 0%, #e8e5fb 100%); border-color: #ddd8f5; }
 .feature-card .duotone { background: rgba(255,255,255,.8); box-shadow: 0 3px 10px rgba(24,91,139,.08); }
 
-/* Tra cứu quy hoạch: nhúng trang GIS xây dựng TP.HCM */
-.planning-frame { position: relative; height: calc(100% - 60px - 67px - 40px); background: #eef3f7; }
-.planning-frame iframe { position: relative; z-index: 1; width: 100%; height: 100%; border: 0; display: block; background: transparent; }
-.planning-loading { position: absolute; inset: 0; z-index: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #6f8497; font-size: 12px; text-align: center; padding: 24px; }
-.planning-spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid #d6e6f3; border-top-color: var(--blue); animation: planning-spin .8s linear infinite; }
+/* Tra cứu quy hoạch: mở trang GIS xây dựng TP.HCM */
+.planning-frame { position: relative; height: calc(100% - 60px - 67px); background: #eef3f7; }
 .planning-open { padding: 0 16px; }
-@keyframes planning-spin { to { transform: rotate(360deg); } }
-.planning-fallback { height: 40px; padding: 0 16px; background: #eaf5ff; border-top: 1px solid #d3ebfc; color: #4f6a80; font-size: 11.5px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; }
-.planning-fallback svg { color: var(--blue); }
-.planning-fallback b { color: var(--blue); font-weight: 700; }
+.planning-info { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #4f6a80; text-align: center; padding: 32px 24px; }
+.planning-info svg { color: var(--blue); }
+.planning-info h3 { margin: 0; font-size: 16px; font-weight: 800; color: #1a2b3c; }
+.planning-info p { margin: 0; max-width: 320px; font-size: 13px; line-height: 1.5; color: #6f8497; }
 
 /* Chi tiết tin tức */
 .news-screen { background: var(--surface); }
@@ -712,7 +709,21 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .cn-simple .cn-avatar { width: 72px; height: 72px; margin-bottom: 14px; background: linear-gradient(135deg, #1a6fd4, #0d57b8); border: 0; color: #fff; font-size: 24px; }
 .cn-field { width: 100%; display: flex; align-items: center; gap: 10px; padding: 14px 2px; border-top: 1px solid var(--line); }
 .cn-field span { flex: 1; color: #6f8497; font-size: 13.5px; }
-.cn-field b { color: var(--navy); font-size: 15px; }
+.cn-field b { color: var(--navy); font-size: 15px; text-align: right; }
+.cn-edit { width: 100%; height: 46px; margin-top: 12px; border-radius: 12px; background: var(--surface); border: 1.5px solid #bcd6ee; color: #1677d2; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 10px rgba(25,82,124,.05); }
+.cn-form { width: 100%; display: grid; gap: 10px; }
+.cn-input > span { display: block; margin-bottom: 5px; color: #6f8497; font-size: 12.5px; font-weight: 600; }
+.cn-input input, .cn-input select { width: 100%; height: 44px; padding: 0 12px; border: 1px solid #e1e9f0; border-radius: 11px; background: #f7fafc; color: var(--navy); font: inherit; font-size: 14px; outline: none; }
+.cn-input input:focus, .cn-input select:focus { border-color: #1677d2; background: #fff; }
+.cn-select { position: relative; }
+.cn-select select { appearance: none; -webkit-appearance: none; padding-right: 34px; }
+.cn-select::after { content: ""; position: absolute; right: 16px; top: 50%; width: 7px; height: 7px; border-right: 1.6px solid #8a9aa8; border-bottom: 1.6px solid #8a9aa8; transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.cn-actions { display: flex; gap: 10px; margin-top: 12px; }
+.cn-btn { height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; cursor: pointer; }
+.cn-btn.primary { flex: 1; background: linear-gradient(100deg, #1175d3, #0864be); color: #fff; box-shadow: 0 5px 12px rgba(15,104,190,.2); }
+.cn-btn.primary.off { opacity: .55; }
+.cn-btn.ghost { flex: 0 0 38%; background: var(--surface); border: 1.5px solid #d6e4f0; color: #5e778c; }
+.cn-saved { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; color: #1f9254; font-size: 13px; font-weight: 700; }
 
 .pa-done .pa-submit + .pa-submit { margin-top: 10px; }
 .pa-submit.pa-submit-ghost { background: #fff; color: var(--blue); border: 1.5px solid #bcd6ee; box-shadow: none; }
