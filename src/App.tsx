@@ -226,7 +226,7 @@ function MapScreen({ go }: { go: (s: Screen) => void }) {
         <iframe src={PLANNING_URL} title="Tra cứu thông tin quy hoạch TP.HCM" onLoad={() => setLoaded(true)} allow="geolocation; fullscreen" referrerPolicy="no-referrer-when-downgrade"/>
       </div>
       <Tap className="planning-fallback" onClick={openOriginal}><Icon name="info" size={15}/>Không hiển thị bản đồ? <b>Mở trang tra cứu gốc</b></Tap>
-      <BottomNav active="Bản đồ" go={go}/>
+      <BottomNav active="Trang chủ" go={go}/>
     </div>
   );
 }
@@ -326,6 +326,7 @@ export default function App() {
       {screen === "phananh" && <PhanAnhModule go={setScreen}/>}
       {screen === "gioithieu" && <GioiThieuModule go={setScreen}/>}
       {screen === "canhan" && <CaNhanScreen go={setScreen}/>}
+      {screen === "bando" && <KhuPhoModule go={setScreen} mapMode/>}
       {screen === "phananh:track" && <PhanAnhModule go={setScreen} initialView="track" exitTo="canhan"/>}
       {screen === "phananh:handle" && <PhanAnhModule go={setScreen} initialView="handle" exitTo="canhan"/>}
       {screen === "thongbao" && <NotificationsScreen go={setScreen}/>}

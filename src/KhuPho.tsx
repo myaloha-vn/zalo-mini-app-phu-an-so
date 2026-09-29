@@ -184,7 +184,7 @@ function WardTile({ ward, onLocate, onDetail }: { ward: Ward; onLocate: () => vo
   );
 }
 
-function WardListScreen({ state, setState, go, openDetail }: { state: ListState; setState: (s: ListState) => void; go: (s: Screen) => void; openDetail: (id: number) => void }) {
+function WardListScreen({ state, setState, go, openDetail, mapMode = false }: { state: ListState; setState: (s: ListState) => void; go: (s: Screen) => void; openDetail: (id: number) => void; mapMode?: boolean }) {
 
   const q = norm(state.query);
   const shown = WARDS.filter((w) =>
@@ -195,20 +195,20 @@ function WardListScreen({ state, setState, go, openDetail }: { state: ListState;
 
   return (
     <div className="screen kp-screen">
-      <Topbar title="Khu phố số" onBack={() => go("home")} end={<Icon name="bell" />} />
+      <Topbar title={mapMode ? "Bản đồ số Phú An" : "Khu phố số"} onBack={() => go("home")} end={<Icon name="bell" />} />
       <div className="kp-body">
-        <div className="kp-search">
+        {!mapMode && <div className="kp-search">
           <Icon name="search" size={18} color="#7890A6" />
           <input value={state.query} onChange={(e) => setState({ ...state, query: e.target.value })} placeholder="Tìm khu phố (vd: Tân An 5)" />
           {state.query && <Tap className="kp-clear" onClick={() => setState({ ...state, query: "" })}>×</Tap>}
-        </div>
+        </div>}
 
-        <div className="kp-toolbar">
+        {!mapMode && <div className="kp-toolbar">
           <div className="kp-toggle">
             <Tap className={state.view === "list" ? "on" : ""} onClick={() => setState({ ...state, view: "list" })}><Icon name="list" size={15} />Danh sách</Tap>
             <Tap className={state.view === "map" ? "on" : ""} onClick={() => setState({ ...state, view: "map" })}><Icon name="map" size={15} />Bản đồ</Tap>
           </div>
-        </div>
+        </div>}
 
         <div className="policy-count"><span>{state.view === "list" ? "Danh sách khu phố" : "Bản đồ khu phố"}</span><small>{shown.length} khu phố</small></div>
 
@@ -236,7 +236,7 @@ function WardListScreen({ state, setState, go, openDetail }: { state: ListState;
           </>
         )}
       </div>
-      <BottomNav active="Trang chủ" go={go} />
+      <BottomNav active={mapMode ? "Bản đồ" : "Trang chủ"} go={go} />
     </div>
   );
 }
@@ -535,8 +535,8 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
 
 /* ---------------- Module ---------------- */
 
-export default function KhuPhoModule({ go }: { go: (s: Screen) => void }) {
-  const [listState, setListState] = useState<ListState>({ query: "", cluster: "Tất cả", view: "list" });
+export default function KhuPhoModule({ go, mapMode = false }: { go: (s: Screen) => void; mapMode?: boolean }) {
+  const [listState, setListState] = useState<ListState>({ query: "", cluster: "Tất cả", view: mapMode ? "map" : "list" });
   const [detailId, setDetailId] = useState<number | null>(null);
 
   if (detailId) {
@@ -550,5 +550,5 @@ export default function KhuPhoModule({ go }: { go: (s: Screen) => void }) {
       />
     );
   }
-  return <WardListScreen state={listState} setState={setListState} go={go} openDetail={setDetailId} />;
+  return <WardListScreen state={listState} setState={setListState} go={go} openDetail={setDetailId} mapMode={mapMode} />;
 }
