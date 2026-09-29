@@ -114,16 +114,6 @@ const DVC_SUBMENU: UtilityGroup[] = [
     items: [
       { label: "Nộp hồ sơ trực tuyến", icon: "document", color: "blue", url: "https://dichvucong.gov.vn" },
       { label: "Tra cứu hồ sơ", icon: "search", color: "green", url: "https://dichvucong.gov.vn" },
-      { label: "Thanh toán trực tuyến", icon: "ticket", color: "orange", url: "https://dichvucong.gov.vn" },
-    ],
-  },
-  {
-    title: "Thủ tục hành chính",
-    items: [
-      { label: "Hộ tịch - hộ khẩu", icon: "document", color: "blue" },
-      { label: "Đăng ký kinh doanh", icon: "briefcase", color: "purple" },
-      { label: "Giáo dục", icon: "book", color: "orange" },
-      { label: "Y tế", icon: "health", color: "green" },
     ],
   },
 ];
