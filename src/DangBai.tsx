@@ -10,7 +10,7 @@ import type { NewsItem } from "./news";
    - Bài gửi qua API; nên có bước UBND phường duyệt trước khi hiển thị công khai. */
 
 // Tài khoản minh hoạ – thay bằng thông tin người dùng đã đăng nhập.
-const DEMO_AUTHOR_WARD = 8;
+export const DEMO_AUTHOR_WARD = 8;
 
 const CATEGORIES = ["Tin tức", "Thông báo", "Hoạt động"];
 const TONES = ["news-one", "news-two", "news-three", "news-four"];

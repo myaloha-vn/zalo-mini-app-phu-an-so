@@ -6,7 +6,8 @@ import DuLichModule from "./DuLich";
 import PhanAnhModule from "./PhanAnh";
 import GioiThieuModule from "./GioiThieu";
 import { WARD_NAMES } from "./wardNames";
-import DangBaiScreen, { userPosts, byDateDesc } from "./DangBai";
+import DangBaiScreen, { userPosts, byDateDesc, DEMO_AUTHOR_WARD } from "./DangBai";
+import { REPORTS, ReportDetail, type Report } from "./PhanAnh";
 import { NewsDetail, ScopeTag, ALL_WARD, type NewsItem } from "./news";
 import quocHuy from "./assets/quoc-huy.png";
 import khuPhoIcon from "./assets/khu-pho-so-v2.png";
@@ -27,7 +28,10 @@ function Logo() {
   );
 }
 
-function Header() {
+const leaderNewReports = () => REPORTS.filter((r) => r.wardId === DEMO_AUTHOR_WARD && r.status === "Đã tiếp nhận").length;
+
+function Header({ onBell }: { onBell: () => void }) {
+  const badge = leaderNewReports();
   return (
     <div className="home-header">
       <div className="brand">
@@ -35,7 +39,7 @@ function Header() {
         <div><div className="brand-name">Phú An Số</div><div className="brand-sub">Kết nối chính quyền – Người dân – Công nghệ số</div></div>
       </div>
       <div className="header-actions">
-        <Tap className="round-action"><Icon name="bell" /></Tap>
+        <Tap className="round-action bell-btn" onClick={onBell}><Icon name="bell" />{badge > 0 && <em className="bell-badge">{badge}</em>}</Tap>
       </div>
     </div>
   );
@@ -167,7 +171,7 @@ function HomeScreen({ go }: { go: (screen: Screen) => void }) {
   if (showAll) return <AllNewsScreen go={go} onBack={() => setShowAll(false)} onOpen={setArticle} filter={newsFilter} setFilter={setNewsFilter}/>;
   return (
     <div className="screen home-screen">
-      <Header />
+      <Header onBell={() => go("thongbao")} />
       <div className="scroll-content">
         <div className="hero hero-banner">
           <img src={bannerImg} alt="Chào mừng đến với Phú An Số – Chuyển đổi số vì Nhân dân" />
@@ -226,6 +230,89 @@ function MapScreen({ go }: { go: (s: Screen) => void }) {
   );
 }
 
+/* ---------------- Thông báo ----------------
+   Cá nhân: thông báo cho Trưởng khu phố khi khu phố có phản ánh mới (demo: Trưởng khu phố của tài khoản mẫu).
+   Tin & thông báo: tin tức, chính sách mới đăng cho người dân.
+   Khi tích hợp: dùng thông báo đẩy (Zalo OA / ZNS) và chỉ hiện tab Cá nhân cho tài khoản có vai trò trưởng khu phố. */
+
+const timeAgo = (d: Date) => {
+  const m = Math.floor((Date.now() - d.getTime()) / 60000);
+  if (m < 60) return `${Math.max(m, 1)} phút trước`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} giờ trước`;
+  const days = Math.floor(h / 24);
+  return days < 30 ? `${days} ngày trước` : `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+};
+
+function NotificationsScreen({ go }: { go: (s: Screen) => void }) {
+  const [tab, setTab] = useState<"me" | "news">("me");
+  const [article, setArticle] = useState<NewsItem | null>(null);
+  const [report, setReport] = useState<Report | null>(null);
+  const [, setTick] = useState(0);
+  const wardName = WARD_NAMES[DEMO_AUTHOR_WARD - 1];
+
+  if (article) return <NewsDetail item={article} onBack={() => setArticle(null)} go={go}/>;
+  if (report) {
+    return (
+      <div className="screen pa-screen">
+        <Topbar title={report.code} onBack={() => setReport(null)}/>
+        <div className="pk-staff-note pk-kp-note"><Icon name="user" size={14}/>Chế độ Trưởng {wardName} (demo)</div>
+        <ReportDetail r={report} staff onChange={() => setTick((t) => t + 1)}/>
+      </div>
+    );
+  }
+
+  const mine = REPORTS.filter((r) => r.wardId === DEMO_AUTHOR_WARD).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const unread = mine.filter((r) => r.status === "Đã tiếp nhận").length;
+  const items = allNews();
+
+  return (
+    <div className="screen news-screen">
+      <Topbar title="Thông báo" onBack={() => go("home")}/>
+      <div className="nt-tabs">
+        <Tap className={tab === "me" ? "on" : ""} onClick={() => setTab("me")}>Cá nhân{unread > 0 && <em>{unread}</em>}</Tap>
+        <Tap className={tab === "news" ? "on" : ""} onClick={() => setTab("news")}>Tin & thông báo</Tap>
+      </div>
+      <div className="nt-body">
+        {tab === "me" ? (
+          <>
+            <div className="nt-role"><Icon name="user" size={14}/>Trưởng {wardName} · nhận thông báo khi khu phố có phản ánh mới (demo)</div>
+            {mine.map((r) => {
+              const isNew = r.status === "Đã tiếp nhận";
+              return (
+                <Tap className={`nt-item ${isNew ? "unread" : ""}`} key={r.code} onClick={() => setReport(r)}>
+                  <span className={`nt-ic ${isNew ? "orange" : r.status === "Đang xử lý" ? "blue" : "green"}`}><Icon name={isNew ? "alert" : "check"} size={17} color="#fff"/></span>
+                  <div className="nt-copy">
+                    <b>{isNew ? "Phản ánh mới cần xử lý" : r.status === "Đang xử lý" ? "Phản ánh đang xử lý" : "Phản ánh đã xử lý xong"}</b>
+                    <p>{r.category}: {r.content}</p>
+                    <span>{r.code} · {timeAgo(r.createdAt)}</span>
+                  </div>
+                  {isNew && <i className="nt-dot"/>}
+                </Tap>
+              );
+            })}
+            {mine.length === 0 && <div className="pk-empty">Chưa có thông báo.</div>}
+          </>
+        ) : (
+          <>
+            {items.map((n) => (
+              <Tap className="nt-item" key={n.title} onClick={() => setArticle(n)}>
+                <span className={`nt-ic ${n.category === "Thông báo" ? "orange" : "blue"}`}><Icon name={n.category === "Thông báo" ? "megaphone" : "document"} size={17} color="#fff"/></span>
+                <div className="nt-copy">
+                  <b>{n.title}</b>
+                  <p>{n.summary}</p>
+                  <span><ScopeTag scope={n.scope}/> {n.date}</span>
+                </div>
+              </Tap>
+            ))}
+          </>
+        )}
+      </div>
+      <BottomNav active="Trang chủ" go={go}/>
+    </div>
+  );
+}
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   return (
@@ -237,6 +324,7 @@ export default function App() {
       {screen === "dulich" && <DuLichModule go={setScreen}/>}
       {screen === "phananh" && <PhanAnhModule go={setScreen}/>}
       {screen === "gioithieu" && <GioiThieuModule go={setScreen}/>}
+      {screen === "thongbao" && <NotificationsScreen go={setScreen}/>}
     </main>
   );
 }

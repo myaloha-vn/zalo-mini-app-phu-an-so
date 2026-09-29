@@ -4,7 +4,7 @@ import dichVuCongIcon from "./assets/dich-vu-cong.png";
 import phanAnhIcon from "./assets/phan-anh-kien-nghi-v3.png";
 import chatbotIcon from "./assets/chatbot-ai-v2.png";
 
-export type Screen = "home" | "map" | "social" | "khupho" | "dulich" | "phananh" | "gioithieu";
+export type Screen = "home" | "map" | "social" | "khupho" | "dulich" | "phananh" | "gioithieu" | "thongbao";
 export type IconName =
   | "chat"
   | "leaf"
