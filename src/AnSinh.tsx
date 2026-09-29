@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
+import { DEMO_RESIDENT } from "./PhanAnh";
 
 /* ---------------- Dữ liệu mẫu (thay bằng API khi tích hợp) ---------------- */
 
@@ -57,7 +58,7 @@ function PolicyCard({ p, onDetail }: { p: Policy; onDetail: () => void }) {
         </div>
       </div>
       <div className="policy-desc">{p.desc}</div>
-      <Tap className="detail-link" onClick={onDetail}>Xem chi tiết <span>→</span></Tap>
+      <Tap className="detail-link" onClick={onDetail}>Xem chi tiết và đăng ký tham gia <span>→</span></Tap>
     </div>
   );
 }
@@ -83,7 +84,7 @@ function ProgramCard({ p, onDetail, wide = false }: { p: Program; onDetail: () =
         <div className="as-prog-row"><Icon name="calendar" size={13} />{p.time}</div>
         <div className="as-prog-row"><Icon name="location" size={13} />{p.place}</div>
         <div className="as-prog-row"><Icon name="people" size={13} />{p.audience}</div>
-        <Tap className="kp-btn solid as-prog-btn" onClick={onDetail}>Xem chi tiết<Icon name="arrow" size={14} /></Tap>
+        <Tap className="kp-btn solid as-prog-btn" onClick={onDetail}>Xem chi tiết và đăng ký<Icon name="arrow" size={14} /></Tap>
       </div>
     </div>
   );
@@ -93,10 +94,19 @@ type Detail = { kind: "policy"; item: Policy } | { kind: "program"; item: Progra
 
 function DetailSheet({ detail, onClose }: { detail: Detail; onClose: () => void }) {
   const st = GROUP_STYLE[detail.item.group];
+  // Bước đăng ký: xem thông tin → xác nhận họ tên, SĐT (tự điền từ tài khoản) → thành công.
+  // Bản demo: chưa gửi lên hệ thống; khi tích hợp, lấy thông tin người dùng đã đăng nhập và gửi qua API.
+  const [step, setStep] = useState<"info" | "confirm" | "done">("info");
+  const [name, setName] = useState(DEMO_RESIDENT.name);
+  const [phone, setPhone] = useState(DEMO_RESIDENT.phone);
+  const [tried, setTried] = useState(false);
+  const phoneOk = /^0\d{9}$/.test(phone.replace(/\s/g, ""));
+  const nameOk = name.trim().length >= 2;
   const rows: [IconName, string, string][] =
     detail.kind === "policy"
       ? [["people", "Đối tượng", detail.item.audience], ["check", "Trạng thái", detail.item.status], ["location", "Nơi tiếp nhận", "Bộ phận Một cửa – UBND phường Phú An"]]
       : [["calendar", "Thời gian", detail.item.time], ["location", "Địa điểm", detail.item.place], ["people", "Đối tượng", detail.item.audience]];
+  const submit = () => { setTried(true); if (nameOk && phoneOk) setStep("done"); };
   return (
     <div className="as-backdrop" onClick={onClose}>
       <div className="as-sheet" onClick={(e) => e.stopPropagation()}>
@@ -108,13 +118,46 @@ function DetailSheet({ detail, onClose }: { detail: Detail; onClose: () => void 
             <div className="as-sheet-title">{detail.item.title}</div>
           </div>
         </div>
-        <div className="as-sheet-rows">
-          {rows.map(([icon, label, value]) => (
-            <div className="as-sheet-row" key={label}><Icon name={icon} size={16} color="#1677d2" /><span>{label}</span><b>{value}</b></div>
-          ))}
-        </div>
-        <div className="as-sheet-desc">{detail.item.desc}</div>
-        <Tap className="primary-button" onClick={onClose}>{detail.kind === "policy" ? "Tôi muốn được tư vấn" : "Đăng ký tham gia"}</Tap>
+
+        {step === "info" && (
+          <>
+            <div className="as-sheet-rows">
+              {rows.map(([icon, label, value]) => (
+                <div className="as-sheet-row" key={label}><Icon name={icon} size={16} color="#1677d2" /><span>{label}</span><b>{value}</b></div>
+              ))}
+            </div>
+            <div className="as-sheet-desc">{detail.item.desc}</div>
+            <Tap className="primary-button" onClick={() => setStep("confirm")}>Đăng ký tham gia</Tap>
+          </>
+        )}
+
+        {step === "confirm" && (
+          <div className="rg-confirm">
+            <div className="rg-title">Xác nhận thông tin đăng ký</div>
+            <div className="rg-hint"><Icon name="check" size={13} />Đã tự điền từ tài khoản của bạn. Sửa lại nếu chưa đúng.</div>
+            <label>Họ và tên</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Họ và tên" />
+            {tried && !nameOk && <div className="pa-error"><Icon name="alert" size={13} />Vui lòng nhập họ tên</div>}
+            <label>Số điện thoại</label>
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Số điện thoại" inputMode="tel" />
+            {tried && !phoneOk && <div className="pa-error"><Icon name="alert" size={13} />Số điện thoại gồm 10 chữ số, bắt đầu bằng 0</div>}
+            <p className="rg-note">Thông tin chỉ dùng để cán bộ phường liên hệ về {detail.kind === "policy" ? "chính sách" : "chương trình"} này.</p>
+            <div className="rg-actions">
+              <Tap className="as-btn ghost" onClick={() => setStep("info")}>Quay lại</Tap>
+              <Tap className="as-btn solid" onClick={submit}>Xác nhận đăng ký</Tap>
+            </div>
+          </div>
+        )}
+
+        {step === "done" && (
+          <div className="rg-done">
+            <div className="pa-done-icon"><Icon name="check" size={30} color="#fff" /></div>
+            <div className="rg-title">Đăng ký thành công</div>
+            <p>Cảm ơn <b>{name.trim()}</b>. Cán bộ phường sẽ liên hệ qua số <b>{phone.trim()}</b> để hướng dẫn các bước tiếp theo.</p>
+            <p className="rg-note">(Bản demo – đăng ký chưa được gửi lên hệ thống.)</p>
+            <Tap className="primary-button" onClick={onClose}>Đóng</Tap>
+          </div>
+        )}
       </div>
     </div>
   );

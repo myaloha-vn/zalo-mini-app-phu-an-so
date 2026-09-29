@@ -20,7 +20,7 @@ const CATEGORIES = [
 ];
 
 // Dữ liệu minh hoạ – thay bằng thông tin khai báo hộ gia đình của người dùng đã đăng nhập.
-const DEMO_RESIDENT = { name: "Nguyễn Văn An", role: "Chủ hộ", phone: "0900 000 888", address: "12 Đường số 5", wardId: 8 };
+export const DEMO_RESIDENT = { name: "Nguyễn Văn An", role: "Chủ hộ", phone: "0900 000 888", address: "12 Đường số 5", wardId: 8 };
 
 const MAX_PHOTOS = 4;
 
