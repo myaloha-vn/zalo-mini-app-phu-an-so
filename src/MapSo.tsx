@@ -117,6 +117,7 @@ export default function MapSoScreen({ go }: { go: (s: Screen) => void }) {
     let errors = 0;
     tiles.on("tileerror", () => { errors += 1; if (errors > 3) setTileError(true); });
     tiles.on("tileload", () => setTileError(false));
+    map.attributionControl.setPrefix(false); // bỏ chữ "Leaflet"; giữ ghi nguồn OSM (bắt buộc theo giấy phép ODbL)
     layerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     return () => { map.remove(); mapRef.current = null; };
