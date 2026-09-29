@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
 import { DEMO_RESIDENT } from "./PhanAnh";
+import { WARD_NAMES } from "./wardNames";
 
 /* ---------------- Dữ liệu mẫu (thay bằng API khi tích hợp) ---------------- */
 
@@ -99,6 +100,7 @@ function DetailSheet({ detail, onClose }: { detail: Detail; onClose: () => void 
   const [step, setStep] = useState<"info" | "confirm" | "done">("info");
   const [name, setName] = useState(DEMO_RESIDENT.name);
   const [phone, setPhone] = useState(DEMO_RESIDENT.phone);
+  const [wardId, setWardId] = useState(DEMO_RESIDENT.wardId);
   const [tried, setTried] = useState(false);
   const phoneOk = /^0\d{9}$/.test(phone.replace(/\s/g, ""));
   const nameOk = name.trim().length >= 2;
@@ -141,6 +143,12 @@ function DetailSheet({ detail, onClose }: { detail: Detail; onClose: () => void 
             <label>Số điện thoại</label>
             <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Số điện thoại" inputMode="tel" />
             {tried && !phoneOk && <div className="pa-error"><Icon name="alert" size={13} />Số điện thoại gồm 10 chữ số, bắt đầu bằng 0</div>}
+            <label>Khu phố</label>
+            <div className="pa-select">
+              <select value={wardId} onChange={(e) => setWardId(Number(e.target.value))}>
+                {WARD_NAMES.map((n, i) => <option key={n} value={i + 1}>{n}</option>)}
+              </select>
+            </div>
             <p className="rg-note">Thông tin chỉ dùng để cán bộ phường liên hệ về {detail.kind === "policy" ? "chính sách" : "chương trình"} này.</p>
             <div className="rg-actions">
               <Tap className="as-btn ghost" onClick={() => setStep("info")}>Quay lại</Tap>
@@ -153,7 +161,7 @@ function DetailSheet({ detail, onClose }: { detail: Detail; onClose: () => void 
           <div className="rg-done">
             <div className="pa-done-icon"><Icon name="check" size={30} color="#fff" /></div>
             <div className="rg-title">Đăng ký thành công</div>
-            <p>Cảm ơn <b>{name.trim()}</b>. Cán bộ phường sẽ liên hệ qua số <b>{phone.trim()}</b> để hướng dẫn các bước tiếp theo.</p>
+            <p>Cảm ơn <b>{name.trim()}</b>. Đăng ký thuộc <b>{WARD_NAMES[wardId - 1]}</b>. Cán bộ phường sẽ liên hệ qua số <b>{phone.trim()}</b> để hướng dẫn các bước tiếp theo.</p>
             <p className="rg-note">(Bản demo – đăng ký chưa được gửi lên hệ thống.)</p>
             <Tap className="primary-button" onClick={onClose}>Đóng</Tap>
           </div>
