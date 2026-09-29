@@ -140,20 +140,37 @@ const allNews = () => [...userPosts, ...news].sort(byDateDesc);
 
 function AllNewsScreen({ go, onBack, onOpen, filter, setFilter }: { go: (s: Screen) => void; onBack: () => void; onOpen: (n: NewsItem) => void; filter: string; setFilter: (f: string) => void }) {
   const items = allNews();
-  const wards = Array.from(new Set(items.map((n) => n.scope).filter((s): s is string => !!s && s !== ALL_WARD)))
-    .sort((a, b) => WARD_NAMES.indexOf(a) - WARD_NAMES.indexOf(b));
-  const chips = ["Tất cả", ALL_WARD, ...wards];
-  const shown = items.filter((n) => filter === "Tất cả" || (n.scope ?? ALL_WARD) === filter);
+  const KP_ALL = "Tin khu phố";
+  const kpMode = filter !== "Tất cả" && filter !== ALL_WARD;
+  const countOf = (w: string) => items.filter((n) => n.scope === w).length;
+  const shown = items.filter((n) => {
+    const scope = n.scope ?? ALL_WARD;
+    if (filter === "Tất cả") return true;
+    if (filter === ALL_WARD) return scope === ALL_WARD;
+    if (filter === KP_ALL) return scope !== ALL_WARD;
+    return scope === filter;
+  });
   return (
     <div className="screen news-screen">
       <Topbar title="Tin tức - Sự kiện" onBack={onBack}/>
       <div className="news-detail an-body">
-        <div className="an-chips">
-          {chips.map((c) => <Tap key={c} className={`db-chip ${c === filter ? "on" : ""}`} onClick={() => setFilter(c)}>{c}</Tap>)}
+        <div className="an-chips nf-chips">
+          <Tap className={`db-chip ${filter === "Tất cả" ? "on" : ""}`} onClick={() => setFilter("Tất cả")}>Tất cả</Tap>
+          <Tap className={`db-chip ${filter === ALL_WARD ? "on" : ""}`} onClick={() => setFilter(ALL_WARD)}>{ALL_WARD}</Tap>
+          <Tap className={`db-chip ${kpMode ? "on" : ""}`} onClick={() => { if (!kpMode) setFilter(KP_ALL); }}>Tin khu phố ▾</Tap>
         </div>
+        {kpMode && (
+          <div className="as-group-select nf-select">
+            <select value={filter} onChange={(e) => setFilter(e.target.value)} aria-label="Chọn khu phố">
+              <option value={KP_ALL}>Tất cả khu phố ({items.filter((n) => (n.scope ?? ALL_WARD) !== ALL_WARD).length})</option>
+              {WARD_NAMES.map((w) => <option key={w} value={w}>{w} ({countOf(w)})</option>)}
+            </select>
+          </div>
+        )}
         <div className="an-count">{shown.length} bài viết</div>
         <div className="news-list">
           {shown.map((item) => <NewsRow key={item.title} item={item} onOpen={() => onOpen(item)}/>)}
+          {!shown.length && <div className="kp-empty"><Icon name="document" size={26}/>Chưa có tin tức nào{kpMode && filter !== KP_ALL ? ` của ${filter}` : ""}.</div>}
         </div>
       </div>
       <BottomNav active="Trang chủ" go={go}/>
