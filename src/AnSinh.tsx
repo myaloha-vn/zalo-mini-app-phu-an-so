@@ -203,7 +203,7 @@ export default function AnSinhModule({ go }: { go: (s: Screen) => void }) {
           {query && <Tap className="kp-clear" onClick={() => setQuery("")}>×</Tap>}
         </div>
 
-        <div className="chips">
+        <div className="chips as-group-wrap">
           {GROUPS.map((g) => <Tap key={g} className={`chip ${group === g ? "selected" : ""}`} onClick={() => setGroup(g)}>{g}</Tap>)}
         </div>
 
