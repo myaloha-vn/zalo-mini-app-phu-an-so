@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SearchScreen from "./TimKiem";
+import HomeSearch from "./TimKiem";
 import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, UtilitySheet, UtilityTile, UTILITY_GROUPS, openUtility, type Screen, type IconName, type Utility } from "./ui";
 import KhuPhoModule from "./KhuPho";
 import AnSinhModule from "./AnSinh";
@@ -168,10 +168,8 @@ function HomeScreen({ go }: { go: (screen: Screen) => void }) {
   const [composing, setComposing] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [newsFilter, setNewsFilter] = useState("Tất cả");
-  const [searching, setSearching] = useState(false);
   if (composing) return <DangBaiScreen onBack={() => setComposing(false)} onPublished={(p) => { setComposing(false); setArticle(p); }}/>;
   if (article) return <NewsDetail item={article} onBack={() => setArticle(null)} go={go}/>;
-  if (searching) return <SearchScreen go={go} onClose={() => setSearching(false)} news={allNews()} openArticle={setArticle}/>;
   if (showAll) return <AllNewsScreen go={go} onBack={() => setShowAll(false)} onOpen={setArticle} filter={newsFilter} setFilter={setNewsFilter}/>;
   return (
     <div className="screen home-screen">
@@ -180,7 +178,7 @@ function HomeScreen({ go }: { go: (screen: Screen) => void }) {
         <div className="hero hero-banner">
           <img src={bannerImg} alt="Chào mừng đến với Phú An Số – Chuyển đổi số vì Nhân dân" />
         </div>
-        <Tap className="search-bar" onClick={() => setSearching(true)}><Icon name="search" size={19} color="#7890A6"/><span>Tìm kiếm dịch vụ, thông tin...</span></Tap>
+        <HomeSearch go={go} news={allNews()} openArticle={setArticle}/>
 
         <div className="feature-grid">
           {featureCards.map((item) => (

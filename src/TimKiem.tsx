@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Icon, Tap, deepLink, DVC_SUBMENU, type Screen } from "./ui";
 import type { NewsItem } from "./news";
 import { WARD_NAMES } from "./wardNames";
@@ -14,10 +14,10 @@ type Hit = { group: string; title: string; sub?: string; keywords?: string; run:
 
 const SUGGEST = ["Khu phố Tân An 5", "Phản ánh", "Nộp hồ sơ", "Người cao tuổi", "Đình làng", "Quy hoạch"];
 
-export default function SearchScreen({ go, onClose, news, openArticle }: { go: (s: Screen) => void; onClose: () => void; news: NewsItem[]; openArticle: (n: NewsItem) => void }) {
+export default function HomeSearch({ go, news, openArticle }: { go: (s: Screen) => void; news: NewsItem[]; openArticle: (n: NewsItem) => void }) {
   const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => { inputRef.current?.focus(); }, []);
 
   const index = useMemo<Hit[]>(() => {
     const open = (url: string) => () => window.open(url, "_blank", "noopener");
@@ -63,44 +63,47 @@ export default function SearchScreen({ go, onClose, news, openArticle }: { go: (
   }, [index, q]);
 
   const groups = [...new Set(results.map((r) => r.group))];
+  const open = focused || words.length > 0;
+  const close = () => { setQuery(""); setFocused(false); inputRef.current?.blur(); };
+  const run = (r: Hit) => { close(); r.run(); };
 
   return (
-    <div className="screen sr-screen">
-      <div className="sr-top">
-        <Tap className="sr-back" onClick={onClose}><Icon name="back" size={22} /></Tap>
-        <div className="sr-input">
-          <Icon name="search" size={18} color="#7890A6" />
-          <input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm dịch vụ, khu phố, tin tức..." />
-          {query && <Tap className="sr-clear" onClick={() => { setQuery(""); inputRef.current?.focus(); }}>×</Tap>}
-        </div>
+    <div className={`hs-wrap ${open ? "open" : ""}`}>
+      {open && <div className="hs-backdrop" onClick={close} />}
+      <div className="search-bar hs-bar">
+        <Icon name="search" size={19} color="#7890A6" />
+        <input ref={inputRef} value={query} onFocus={() => setFocused(true)} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm kiếm dịch vụ, thông tin..." />
+        {query && <Tap className="sr-clear" onClick={() => { setQuery(""); inputRef.current?.focus(); }}>×</Tap>}
       </div>
-      <div className="sr-body">
-        {!words.length && (
-          <>
-            <div className="sr-label">Gợi ý tìm kiếm</div>
-            <div className="sr-suggest">
-              {SUGGEST.map((s) => <Tap key={s} className="sr-chip" onClick={() => setQuery(s)}>{s}</Tap>)}
+      {open && (
+        <div className="hs-panel">
+          {!words.length && (
+            <>
+              <div className="sr-label">Gợi ý tìm kiếm</div>
+              <div className="sr-suggest">
+                {SUGGEST.map((s) => <Tap key={s} className="sr-chip" onClick={() => { setQuery(s); inputRef.current?.focus(); }}>{s}</Tap>)}
+              </div>
+            </>
+          )}
+          {words.length > 0 && !results.length && (
+            <div className="kp-empty"><Icon name="search" size={26} />Không tìm thấy kết quả cho “{query.trim()}”</div>
+          )}
+          {groups.map((g) => (
+            <div key={g} className="sr-group">
+              <div className="sr-label">{g} <span>{results.filter((r) => r.group === g).length}</span></div>
+              {results.filter((r) => r.group === g).slice(0, 6).map((r) => (
+                <Tap key={g + r.title} className="sr-item" onClick={() => run(r)}>
+                  <div className="sr-item-copy">
+                    <b>{r.title}</b>
+                    {r.sub && <small>{r.sub}</small>}
+                  </div>
+                  <Icon name="arrow" size={14} color="#9aabb9" />
+                </Tap>
+              ))}
             </div>
-          </>
-        )}
-        {words.length > 0 && !results.length && (
-          <div className="kp-empty"><Icon name="search" size={26} />Không tìm thấy kết quả cho “{query.trim()}”</div>
-        )}
-        {groups.map((g) => (
-          <div key={g} className="sr-group">
-            <div className="sr-label">{g} <span>{results.filter((r) => r.group === g).length}</span></div>
-            {results.filter((r) => r.group === g).slice(0, 8).map((r) => (
-              <Tap key={g + r.title} className="sr-item" onClick={r.run}>
-                <div className="sr-item-copy">
-                  <b>{r.title}</b>
-                  {r.sub && <small>{r.sub}</small>}
-                </div>
-                <Icon name="arrow" size={14} color="#9aabb9" />
-              </Tap>
-            ))}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
