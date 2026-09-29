@@ -138,32 +138,6 @@ export const UTILITY_GROUPS: UtilityGroup[] = [
       { label: "Chatbot AI", icon: "chat", color: "green", img: chatbotIcon },
     ],
   },
-  {
-    title: "Dịch vụ nổi bật",
-    items: [
-      { label: "Khu phố số", icon: "home", color: "blue", screen: "khupho" },
-      { label: "Tra cứu quy hoạch", icon: "map", color: "green", screen: "map" },
-      { label: "An sinh xã hội", icon: "people", color: "orange", screen: "social" },
-      { label: "Du lịch Phú An", icon: "location", color: "purple", screen: "dulich" },
-    ],
-  },
-  {
-    title: "Thủ tục hành chính",
-    items: [
-      { label: "Hộ tịch - hộ khẩu", icon: "document", color: "blue" },
-      { label: "Đăng ký kinh doanh", icon: "briefcase", color: "purple" },
-      { label: "Giáo dục", icon: "book", color: "orange" },
-      { label: "Y tế", icon: "health", color: "green" },
-    ],
-  },
-  {
-    title: "Cộng đồng",
-    items: [
-      { label: "Tin tức - sự kiện", icon: "megaphone", color: "teal" },
-      { label: "Lịch tiếp công dân", icon: "calendar", color: "blue" },
-      { label: "Hỏi đáp", icon: "star", color: "red" },
-    ],
-  },
 ];
 
 const isReady = (it: Utility) => Boolean(it.screen || it.url || it.submenu);
