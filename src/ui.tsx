@@ -110,7 +110,7 @@ export type UtilityGroup = { title: string; items: Utility[] };
 // Menu con của "Dịch vụ công". Đường dẫn trỏ tới Cổng Dịch vụ công Quốc gia; đổi sang cổng DVC TP.HCM / hệ thống của phường nếu cần.
 const DVC_SUBMENU: UtilityGroup[] = [
   {
-    title: "Nộp & tra cứu hồ sơ",
+    title: "",
     items: [
       { label: "Nộp hồ sơ trực tuyến", icon: "document", color: "blue", url: "https://dichvucong.gov.vn" },
       { label: "Tra cứu hồ sơ", icon: "search", color: "green", url: "https://dichvucong.gov.vn" },
@@ -161,8 +161,8 @@ export function UtilitySheet({ onClose, go, title = "Tiện ích", groups = UTIL
         </div>
         <div className="util-scroll">
           {groups.map((g) => (
-            <div className="util-group" key={g.title}>
-              <div className="util-group-title">{g.title}</div>
+            <div className="util-group" key={g.title || "main"}>
+              {g.title && <div className="util-group-title">{g.title}</div>}
               <div className="util-grid">
                 {g.items.map((it) => (
                   <UtilityTile key={it.label} item={it} onClick={() => openUtility(it, (s) => { onClose(); go(s); }, setSub)} />
