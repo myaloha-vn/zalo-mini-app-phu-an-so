@@ -104,7 +104,7 @@ export function DuotoneIcon({ icon, color, small = false }: { icon: IconName; co
 
 /* ---------------- Menu tiện ích (dùng chung cho thanh điều hướng & trang chủ) ---------------- */
 
-export type Utility = { label: string; icon: IconName; color: string; screen?: Screen; img?: string; url?: string; submenu?: UtilityGroup[] };
+export type Utility = { label: string; icon: IconName; color: string; screen?: Screen; img?: string; url?: string; submenu?: UtilityGroup[]; hideSoon?: boolean };
 export type UtilityGroup = { title: string; items: Utility[] };
 
 // Menu con của "Dịch vụ công". Đường dẫn trỏ tới Cổng Dịch vụ công Quốc gia; đổi sang cổng DVC TP.HCM / hệ thống của phường nếu cần.
@@ -125,7 +125,7 @@ export const UTILITY_GROUPS: UtilityGroup[] = [
       { label: "Giới thiệu phường", icon: "info", color: "blue", img: gioiThieuIcon, screen: "gioithieu" },
       { label: "Dịch vụ công", icon: "document", color: "purple", img: dichVuCongIcon, submenu: DVC_SUBMENU },
       { label: "Phản ánh kiến nghị", icon: "alert", color: "orange", img: phanAnhIcon, screen: "phananh" },
-      { label: "Chatbot AI", icon: "chat", color: "green", img: chatbotIcon },
+      { label: "Chatbot AI", icon: "chat", color: "green", img: chatbotIcon, hideSoon: true },
     ],
   },
 ];
@@ -140,10 +140,10 @@ export function openUtility(it: Utility, go: (s: Screen) => void, openSubmenu: (
 
 export function UtilityTile({ item, onClick }: { item: Utility; onClick?: () => void }) {
   return (
-    <Tap className={`util-tile ${isReady(item) ? "" : "soon"}`} onClick={onClick}>
+    <Tap className={`util-tile ${isReady(item) || item.hideSoon ? "" : "soon"}`} onClick={onClick}>
       {item.img ? <img className="util-img" src={item.img} alt="" /> : <DuotoneIcon icon={item.icon} color={item.color} small />}
       <div className="util-label">{item.label}</div>
-      {!isReady(item) && <span className="util-soon">Sắp có</span>}
+      {!isReady(item) && !item.hideSoon && <span className="util-soon">Sắp có</span>}
     </Tap>
   );
 }
