@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
+import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, deepLink, type Screen, type IconName } from "./ui";
 import { DEMO_RESIDENT } from "./PhanAnh";
 import { WARD_NAMES } from "./wardNames";
 
@@ -23,7 +23,7 @@ const STATUS_TONE: Record<Status, string> = { "Đang áp dụng": "ok", "Đang t
 type Policy = { group: Group; status: Status; title: string; audience: string; desc: string };
 type Program = { group: Group; title: string; time: string; place: string; audience: string; desc: string };
 
-const POLICIES: Policy[] = [
+export const POLICIES: Policy[] = [
   { group: "Người có công", status: "Đang áp dụng", title: "Trợ cấp ưu đãi hằng tháng cho người có công", audience: "Thương binh, thân nhân liệt sĩ, người có công với cách mạng", desc: "Chi trả trợ cấp, phụ cấp ưu đãi hằng tháng và các chế độ đi kèm theo quy định." },
   { group: "Người có công", status: "Đang tiếp nhận", title: "Hỗ trợ cải thiện nhà ở cho người có công", audience: "Hộ người có công có nhà ở xuống cấp", desc: "Hỗ trợ kinh phí xây mới hoặc sửa chữa nhà ở cho gia đình người có công." },
   { group: "Bảo trợ xã hội", status: "Đang tiếp nhận", title: "Trợ cấp xã hội hằng tháng", audience: "Người cao tuổi, người khuyết tật, trẻ em mồ côi", desc: "Tiếp nhận hồ sơ và chi trả trợ cấp xã hội hằng tháng tại phường." },
@@ -34,7 +34,7 @@ const POLICIES: Policy[] = [
   { group: "Nhà ở", status: "Đang tiếp nhận", title: "Hỗ trợ tiếp cận nhà ở xã hội", audience: "Người có thu nhập thấp, công nhân lao động", desc: "Hướng dẫn thủ tục đăng ký mua, thuê nhà ở xã hội và vay vốn ưu đãi." },
 ];
 
-const PROGRAMS: Program[] = [
+export const PROGRAMS: Program[] = [
   { group: "Y tế", title: "Khám sức khoẻ miễn phí cho người cao tuổi", time: "05/07 – 06/07/2025", place: "Trạm Y tế phường Phú An", audience: "Người từ 60 tuổi trở lên", desc: "Khám tổng quát, đo huyết áp, đường huyết và tư vấn dinh dưỡng miễn phí." },
   { group: "Bảo trợ xã hội", title: "Trao quà hỗ trợ hộ gia đình khó khăn", time: "10/07/2025", place: "Nhà văn hoá Khu phố Tân An 5", audience: "Hộ nghèo, hộ cận nghèo", desc: "Trao quà nhu yếu phẩm và tiền hỗ trợ cho các hộ có hoàn cảnh khó khăn." },
   { group: "Việc làm", title: "Ngày hội việc làm phường Phú An 2025", time: "12/07/2025", place: "Hội trường UBND phường", audience: "Người lao động từ 18 tuổi", desc: "Kết nối trực tiếp với doanh nghiệp đang tuyển dụng trên địa bàn." },
@@ -186,7 +186,14 @@ export default function AnSinhModule({ go }: { go: (s: Screen) => void }) {
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState<(typeof GROUPS)[number]>("Tất cả");
   const [allPrograms, setAllPrograms] = useState(false);
-  const [detail, setDetail] = useState<Detail | null>(null);
+  const [detail, setDetail] = useState<Detail | null>(() => {
+    const t = deepLink.policy; delete deepLink.policy;
+    if (!t) return null;
+    const pol = POLICIES.find((x) => x.title === t);
+    if (pol) return { kind: "policy", item: pol };
+    const pr = PROGRAMS.find((x) => x.title === t);
+    return pr ? { kind: "program", item: pr } : null;
+  });
 
   const q = norm(query);
   const match = (x: { group: Group; title: string; audience: string; desc: string }) =>

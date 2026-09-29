@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { WARD_NAMES, shortWard } from "./wardNames";
-import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
+import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, deepLink, type Screen, type IconName } from "./ui";
 import { PhanAnhForm, ReportList, ReportDetail, REPORTS, type Report } from "./PhanAnh";
 import { userPosts, byDateDesc } from "./DangBai";
 import { NewsDetail, type NewsItem } from "./news";
@@ -545,7 +545,7 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
 
 export default function KhuPhoModule({ go, mapMode = false }: { go: (s: Screen) => void; mapMode?: boolean }) {
   const [listState, setListState] = useState<ListState>({ query: "", cluster: "Tất cả", view: mapMode ? "map" : "list" });
-  const [detailId, setDetailId] = useState<number | null>(null);
+  const [detailId, setDetailId] = useState<number | null>(() => { const id = deepLink.ward ?? null; delete deepLink.ward; return id; });
 
   if (detailId) {
     return (

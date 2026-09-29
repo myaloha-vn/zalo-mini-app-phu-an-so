@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, type Screen, type IconName } from "./ui";
+import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, deepLink, type Screen, type IconName } from "./ui";
 
 /* ---------------- Dữ liệu mẫu (thay bằng dữ liệu thật của phường) ---------------- */
 
@@ -15,7 +15,7 @@ const CAT_STYLE: Record<Cat, { color: string; ink: string; icon: IconName }> = {
 
 type Place = { id: number; name: string; ward: string; cat: Cat; x: number; y: number; intro: string; exps: [string, string][] };
 
-const PLACES: Place[] = [
+export const PLACES: Place[] = [
   { id: 1, name: "Công viên ven sông Phú An", ward: "Khu phố Tân An 5", cat: "Sinh thái", x: 205, y: 186, intro: "Không gian xanh dọc bờ sông với đường đi bộ, đường đạp xe và bãi cỏ dã ngoại.", exps: [["Đi bộ, chạy bộ ven sông", "45 phút"], ["Đạp xe dọc bờ sông", "60 phút"], ["Dã ngoại bãi cỏ", "90 phút"], ["Ngắm hoàng hôn", "30 phút"]] },
   { id: 2, name: "Vườn trái cây sinh thái", ward: "Khu phố An Thuận", cat: "Sinh thái", x: 300, y: 228, intro: "Nhà vườn mở cửa đón khách tham quan, hái và thưởng thức trái cây theo mùa.", exps: [["Hái trái cây tại vườn", "60 phút"], ["Thưởng thức đặc sản vườn", "30 phút"], ["Tìm hiểu kỹ thuật trồng cây", "30 phút"]] },
   { id: 3, name: "Đình làng Phú An", ward: "Khu phố Tân An 8", cat: "Văn hóa", x: 150, y: 110, intro: "Công trình tín ngưỡng của cộng đồng, nơi diễn ra các lễ hội truyền thống hằng năm.", exps: [["Tham quan kiến trúc đình", "30 phút"], ["Tìm hiểu lễ hội truyền thống", "30 phút"], ["Nghe thuyết minh lịch sử", "20 phút"]] },
@@ -388,7 +388,7 @@ function TourScreen({ tour, go, open, back }: { tour: Tour; go: (s: Screen) => v
 /* ---------------- Module ---------------- */
 
 export default function DuLichModule({ go }: { go: (s: Screen) => void }) {
-  const [stack, setStack] = useState<View[]>([{ name: "explore" }]);
+  const [stack, setStack] = useState<View[]>(() => { const id = deepLink.place; delete deepLink.place; return id ? [{ name: "explore" }, { name: "place", id }] : [{ name: "explore" }]; });
   const [tab, setTab] = useState<"mood" | "tours">("mood");
   const view = stack[stack.length - 1];
   const open = (v: View) => setStack([...stack, v]);

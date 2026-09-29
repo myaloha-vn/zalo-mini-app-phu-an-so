@@ -43,6 +43,9 @@ export type IconName =
   | "calendar"
   | "check";
 
+/** Mở thẳng một mục khi chuyển màn hình (dùng cho tìm kiếm). Module đọc xong sẽ xoá. */
+export const deepLink: { ward?: number; place?: number; policy?: string } = {};
+
 export function Icon({ name, size = 22, color = "currentColor" }: { name: IconName; size?: number; color?: string }) {
   const common = {
     width: size,
@@ -108,7 +111,7 @@ export type Utility = { label: string; icon: IconName; color: string; screen?: S
 export type UtilityGroup = { title: string; items: Utility[] };
 
 // Menu con của "Dịch vụ công". Đường dẫn trỏ tới Cổng Dịch vụ công Quốc gia; đổi sang cổng DVC TP.HCM / hệ thống của phường nếu cần.
-const DVC_SUBMENU: UtilityGroup[] = [
+export const DVC_SUBMENU: UtilityGroup[] = [
   {
     title: "",
     items: [
