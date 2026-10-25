@@ -4,6 +4,7 @@ import { Icon, Tap, DuotoneIcon, BottomNav, Topbar, deepLink, type Screen, type 
 import { PhanAnhForm, ReportList, ReportDetail, REPORTS, type Report } from "./PhanAnh";
 import { userPosts, byDateDesc } from "./DangBai";
 import { NewsDetail, type NewsItem } from "./news";
+import HoSoAnSinhPanel from "./HoSoAnSinh";
 
 /* ---------------- Dữ liệu mẫu (thay bằng API khi tích hợp) ---------------- */
 
@@ -260,144 +261,6 @@ function spaceData(w: Ward): Record<string, Post[]> {
   };
 }
 
-/* ---------------- Hồ sơ an sinh trên bản đồ ---------------- */
-// DỮ LIỆU MINH HOẠ (tên, hoàn cảnh là giả định). Hồ sơ an sinh thật là dữ liệu cá nhân nhạy cảm:
-// TODO trước khi dùng dữ liệu thật: chỉ hiển thị cho cán bộ đã đăng nhập & được phân quyền, lấy qua API có kiểm soát truy cập.
-
-type WelfareStatus = "Đang hỗ trợ" | "Đang theo dõi" | "Chờ xét duyệt";
-type Welfare = {
-  code: string;
-  group: string;
-  groupColor: string;
-  status: WelfareStatus;
-  name: string;
-  address: string;
-  support: string;
-  note: string;
-  amount: string;
-  officer: string;
-  updated: string;
-  x: number; // vị trí ghim trên bản đồ (%)
-  y: number;
-};
-
-const WELFARE_SEED = [
-  { group: "Người cao tuổi", groupColor: "green", status: "Đang theo dõi", name: "Bà Trần Thị Sáu", support: "Trợ cấp hàng tháng", note: "Sống cùng cháu nhỏ, không có nguồn thu nhập ổn định.", amount: "500.000đ/tháng", x: 34, y: 38 },
-  { group: "Hộ cận nghèo", groupColor: "orange", status: "Đang hỗ trợ", name: "Hộ ông Lê Văn Bảy", support: "Hỗ trợ thẻ BHYT, học phí", note: "Lao động chính làm nghề tự do, thu nhập không ổn định.", amount: "Theo chính sách", x: 62, y: 30 },
-  { group: "Người khuyết tật", groupColor: "purple", status: "Đang hỗ trợ", name: "Ông Nguyễn Văn Tám", support: "Trợ cấp xã hội hàng tháng", note: "Khuyết tật vận động, cần hỗ trợ đi lại khi làm thủ tục.", amount: "720.000đ/tháng", x: 46, y: 64 },
-  { group: "Hộ nghèo", groupColor: "blue", status: "Chờ xét duyệt", name: "Hộ bà Phạm Thị Chín", support: "Đề nghị hỗ trợ sửa chữa nhà", note: "Nhà xuống cấp, đang chờ khảo sát thực tế.", amount: "Chờ xét duyệt", x: 70, y: 60 },
-] as const;
-
-function welfareData(w: Ward): Welfare[] {
-  return WELFARE_SEED.map((r, i) => ({
-    ...r,
-    status: r.status as WelfareStatus,
-    code: `AS-${pad(w.id)}-${String(i + 1).padStart(3, "0")}`,
-    address: `${w.name}, Phường Phú An`,
-    officer: `Cán bộ LĐ-TB&XH phụ trách ${w.name}`,
-    updated: ["22/06/2025", "18/06/2025", "12/06/2025", "20/06/2025"][i],
-  }));
-}
-
-const STATUS_DOT: Record<WelfareStatus, string> = { "Đang hỗ trợ": "#289c73", "Đang theo dõi": "#8a9aa8", "Chờ xét duyệt": "#d9822f" };
-const PIN_COLOR: Record<string, string> = { green: "#289c73", orange: "#e0852f", purple: "#7451bf", blue: "#1677d2" };
-
-function openDirections(address: string) {
-  window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address + ", TP. Hồ Chí Minh")}`, "_blank", "noopener");
-}
-
-function WelfareCard({ item, onDetail, onClose }: { item: Welfare; onDetail: () => void; onClose?: () => void }) {
-  return (
-    <div className="as-card">
-      <div className="as-card-top">
-        <span className={`category ${item.groupColor}`}>{item.group}</span>
-        <span className="as-status"><i style={{ background: STATUS_DOT[item.status] }} />{item.status}</span>
-        {onClose && <Tap className="as-close" onClick={onClose}>✕</Tap>}
-      </div>
-      <div className="as-name">{item.name}</div>
-      <div className="as-row"><b>Địa chỉ</b><span>{item.address}</span></div>
-      <div className="as-row"><b>Hỗ trợ</b><span>{item.support}</span></div>
-      <div className="as-note">{item.note}</div>
-      <div className="as-actions">
-        <Tap className="as-btn solid" onClick={onDetail}>Xem chi tiết</Tap>
-        <Tap className="as-btn ghost" onClick={() => openDirections(item.address)}>Chỉ đường</Tap>
-      </div>
-    </div>
-  );
-}
-
-function WelfareDetail({ item, onBack }: { item: Welfare; onBack: () => void }) {
-  const rows: [string, string][] = [
-    ["Mã hồ sơ", item.code],
-    ["Nhóm đối tượng", item.group],
-    ["Trạng thái", item.status],
-    ["Địa chỉ", item.address],
-    ["Nội dung hỗ trợ", item.support],
-    ["Mức hỗ trợ", item.amount],
-    ["Cán bộ phụ trách", item.officer],
-    ["Cập nhật lần cuối", item.updated],
-  ];
-  return (
-    <div className="as-detail">
-      <div className="as-detail-head">
-        <Tap className="as-back" onClick={onBack}><Icon name="back" size={18} /></Tap>
-        <div><div className="as-name">{item.name}</div><span className={`category ${item.groupColor}`}>{item.group}</span></div>
-      </div>
-      <div className="as-table">{rows.map(([k, v]) => <div className="as-row" key={k}><b>{k}</b><span>{v}</span></div>)}</div>
-      <div className="as-note">{item.note}</div>
-      <div className="as-actions">
-        <Tap className="as-btn ghost" onClick={() => openDirections(item.address)}>Chỉ đường</Tap>
-      </div>
-    </div>
-  );
-}
-
-function WelfareMapPanel({ ward }: { ward: Ward }) {
-  const [selected, setSelected] = useState<number | null>(null);
-  const [detail, setDetail] = useState(false);
-  const items = welfareData(ward);
-  const cur = selected !== null ? items[selected] : null;
-
-
-
-  const close = () => { setSelected(null); setDetail(false); };
-  return (
-    <div className="as-wrap">
-      <div className="as-map-box">
-        <div className="as-demo">Dữ liệu minh hoạ</div>
-        <WardMap highlight={ward.id} zoom className="as-map" />
-        {items.map((it, i) => (
-          <Tap key={it.code} className={`as-pin ${selected === i ? "on" : ""}`} onClick={() => { setSelected(i); setDetail(false); }}>
-            <svg viewBox="0 0 24 30" width="26" height="32" aria-label={it.name} style={{ left: `${it.x}%`, top: `${it.y}%` }}>
-              <path d="M12 29C4 19 1 15 1 11a11 11 0 0 1 22 0c0 4-3 8-11 18Z" fill={PIN_COLOR[it.groupColor]} stroke="#fff" strokeWidth="2" />
-              <circle cx="12" cy="11" r="4" fill="#fff" />
-            </svg>
-          </Tap>
-        ))}
-      </div>
-      <div className="as-count"><b>{items.length}</b> hồ sơ an sinh tại {ward.name}</div>
-      <div className="news-list kp-posts as-list">
-        {items.map((it, i) => (
-          <Tap className={`news-item ${selected === i ? "on" : ""}`} key={it.code} onClick={() => { setSelected(i); setDetail(false); }}>
-            <span className="as-list-pin" style={{ background: PIN_COLOR[it.groupColor] }}><Icon name="location" size={15} color="#fff" /></span>
-            <div className="news-copy">
-              <div className="news-title">{it.name}</div>
-              <div className="news-date"><span className={`category ${it.groupColor}`}>{it.group}</span><span className="as-status"><i style={{ background: STATUS_DOT[it.status] }} />{it.status}</span></div>
-            </div>
-          </Tap>
-        ))}
-      </div>
-      {cur && (
-        <div className="as-backdrop" onClick={close}>
-          <div className="as-sheet" onClick={(e) => e.stopPropagation()}>
-            {detail ? <WelfareDetail item={cur} onBack={() => setDetail(false)} /> : <WelfareCard item={cur} onDetail={() => setDetail(true)} onClose={close} />}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 const PHOTOS = [
   { caption: "Ra quân Ngày Chủ nhật xanh", date: "22/06/2025", tone: "news-one" },
   { caption: "Lớp kỹ năng số cho người cao tuổi", date: "19/06/2025", tone: "news-two" },
@@ -504,7 +367,7 @@ function WardDetailScreen({ ward, onBack, go, openFullMap }: { ward: Ward; onBac
         )}
         {tab === "Phản ánh" ? (paMode === "mine"
           ? <ReportList items={myWardReports} onOpen={(r) => setReport({ r, staff: false })} empty={`Bạn chưa gửi phản ánh nào tới ${ward.name}.`} />
-          : <ReportList items={wardReports} onOpen={(r) => setReport({ r, staff: true })} empty="Khu phố chưa có phản ánh nào." />) : tab === "Hồ sơ an sinh" ? <WelfareMapPanel ward={ward} /> : <div className="news-list kp-posts">
+          : <ReportList items={wardReports} onOpen={(r) => setReport({ r, staff: true })} empty="Khu phố chưa có phản ánh nào." />) : tab === "Hồ sơ an sinh" ? <HoSoAnSinhPanel key={ward.id} wardId={ward.id} wardName={ward.name} /> : <div className="news-list kp-posts">
           {tab === "Tin tức - Thông báo" && wardPosts.map((p) => (
             <Tap className="news-item" key={p.title} onClick={() => setArticle(p)}>
               {p.image ? <img className="news-thumb news-thumb-img kp-post-thumb" src={p.image} alt="" /> : <div className={`news-thumb kp-post-thumb ${p.tone}`}><div className="news-building" /><div className="news-tree" /></div>}
