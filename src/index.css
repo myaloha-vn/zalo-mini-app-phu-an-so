@@ -809,9 +809,7 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 .hs-map { position: absolute; inset: 0; }
 .hs-map .leaflet-control-attribution { font-size: 9px; padding: 0 5px; background: rgba(255,255,255,.7); color: #7a8b99; }
 .hs-map-badge { position: absolute; z-index: 500; top: 8px; left: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 8px; background: rgba(16,46,73,.8); color: #fff; font-size: 11px; font-weight: 700; pointer-events: none; }
-.hs-map-badge i, .hs-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; border: 1.5px solid #fff; box-shadow: 0 0 0 1px rgba(16,46,73,.12); }
-.hs-legend { display: flex; flex-wrap: wrap; gap: 5px 12px; margin: 10px 2px 0; color: #34506a; font-size: 11px; font-weight: 650; }
-.hs-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.hs-map-badge i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; border: 1.5px solid #fff; box-shadow: 0 0 0 1px rgba(16,46,73,.12); }
 .hs-dot-wrap { background: none; border: 0; }
 .hs-dot { display: block; width: 14px; height: 14px; margin: 2px; border-radius: 50%; background: var(--c); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); transition: transform .15s, opacity .15s; }
 .hs-dot.picked { transform: scale(1.5); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 35%, transparent), 0 2px 6px rgba(0,0,0,.35); }

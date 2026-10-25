@@ -281,11 +281,6 @@ export default function HoSoAnSinhPanel({ wardId, wardName }: { wardId: number; 
             : <>{all.length} điểm · {GROUPS.length} nhóm</>}
         </div>
       </div>
-      {!g && (
-        <div className="hs-legend">
-          {GROUPS.map((x) => <span key={x.key}><i style={{ background: x.color }} />{x.label}</span>)}
-        </div>
-      )}
 
       {/* Cấp 1: nhóm đối tượng */}
       {!g && (
